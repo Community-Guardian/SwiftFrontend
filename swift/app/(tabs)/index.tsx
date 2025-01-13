@@ -44,6 +44,7 @@ export default function HomeScreen() {
           { title: "Buy Signals", route: "/subscribe", color: themeColors.primary },
           { title: "Invest With Us", route: "/invest", color: themeColors.primary },
           { title: "Earn With Us", route: "/enroll", color: themeColors.secondary },
+          
         ].map((item, index) => (
           <Card
             key={index}
