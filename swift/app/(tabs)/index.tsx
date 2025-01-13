@@ -1,74 +1,121 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Card } from '../../components/Card';
+import { Sidebar } from '../../components/Sidebar'; // Import your Sidebar component
+import { useTheme } from '../../context/ThemeContext';
+import { lightTheme, darkTheme } from '../../styles/theme';
+import { ThemeToggle } from '../../components/ThemeToggle';
 
 export default function HomeScreen() {
+  const [isSidebarVisible, setSidebarVisible] = useState(false);
+  const router = useRouter();
+  const { theme } = useTheme();
+  const themeColors = theme === 'light' ? lightTheme : darkTheme;
+
+  const toggleSidebar = () => setSidebarVisible((prev) => !prev);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      {/* Sidebar */}
+      <Modal
+        visible={isSidebarVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={toggleSidebar}
+      >
+        <Sidebar closeSidebar={toggleSidebar} />
+      </Modal>
+
+      <View style={styles.header}>
+        {/* Hamburger Menu */}
+        <TouchableOpacity onPress={toggleSidebar} style={styles.hamburger}>
+          <View style={styles.line} />
+          <View style={styles.line} />
+          <View style={styles.line} />
+        </TouchableOpacity>
+        {/* Theme Toggle */}
+        <ThemeToggle />
+      </View>
+
+      <View style={styles.grid}>
+        {[
+          { title: "Enroll for Courses", route: "/enroll", color: themeColors.secondary },
+          { title: "Buy Signals", route: "/subscribe", color: themeColors.primary },
+          { title: "Invest With Us", route: "/invest", color: themeColors.primary },
+          { title: "Earn With Us", route: "/enroll", color: themeColors.secondary },
+        ].map((item, index) => (
+          <Card
+            key={index}
+            title={item.title}
+            onPress={() => router.push(item.route)}
+            style={[styles.card, { backgroundColor: item.color }]}
+          />
+        ))}
+      </View>
+      <Card
+        title="Get the Book"
+        onPress={() => {}}
+        style={[styles.bookButton, { backgroundColor: themeColors.primary }]}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 24,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  hamburger: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  line: {
+    width: 24,
+    height: 3,
+    backgroundColor: '#333',
+    marginVertical: 2,
+    borderRadius: 2,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    width: '40%',
+    marginBottom: 16,
+    aspectRatio: 1,
+    borderRadius: 12,
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  bookButton: {
     position: 'absolute',
+    bottom: 32,
+    left: 16,
+    right: 16,
+    borderRadius: 12,
+    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });
