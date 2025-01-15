@@ -1,22 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Share } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useReferrals } from '../../context/ReferralsContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function EarnScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
-  const [email, setEmail] = useState('');
-  const [referrals, setReferrals] = useState<string[]>([]);
+  const { user } = useAuth();
+  const { referrals, getReferrals, createReferral, loading } = useReferrals();
 
-  const handleRefer = () => {
-    if (email) {
-      setReferrals([...referrals, email]);
-      setEmail('');
-      Alert.alert('Success', 'Referral sent successfully!');
+  useEffect(() => {
+    getReferrals();
+  }, []);
+
+  const handleRefer = async () => {
+    if (user && user.referral_code) {
+      try {
+        const result = await Share.share({
+          message: `Join us and earn rewards! Use my referral code: ${user.referral_code}`,
+        });
+
+        if (result.action === Share.sharedAction) {
+          if (result.activityType) {
+            // shared with activity type of result.activityType
+          } else {
+            // shared
+            await createReferral({ referrer: user.referral_code });
+            Alert.alert('Success', 'Referral sent successfully!');
+          }
+        } else if (result.action === Share.dismissedAction) {
+          // dismissed
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to send referral.');
+      }
     } else {
-      Alert.alert('Error', 'Please enter an email address.');
+      Alert.alert('Error', 'User referral code not found.');
     }
   };
 
@@ -27,31 +49,26 @@ export default function EarnScreen() {
         Refer your friends and earn rewards!
       </Text>
 
-      <View style={[styles.inputContainer, { backgroundColor: themeColors.card }]}>
-        <Ionicons name="mail" size={20} color={themeColors.text} />
-        <TextInput
-          style={[styles.input, { color: themeColors.text }]}
-          placeholder="Enter friend's email"
-          placeholderTextColor={themeColors.text}
-          value={email}
-          onChangeText={setEmail}
-        />
-      </View>
-
       <TouchableOpacity onPress={handleRefer} style={[styles.button, { backgroundColor: themeColors.primary }]}>
-        <Text style={styles.buttonText}>Refer Now</Text>
+        <Text style={styles.buttonText}>Share Referral Code</Text>
       </TouchableOpacity>
 
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
-      <FlatList
-        data={referrals}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.referralItem, { backgroundColor: themeColors.card }]}>
-            <Text style={[styles.referralText, { color: themeColors.text }]}>{item}</Text>
-          </View>
-        )}
-      />
+      {referrals.length === 0 ? (
+        <Text style={[styles.noReferralsText, { color: themeColors.text }]}>
+          You have no referrals yet. Share your referral code to start earning rewards!
+        </Text>
+      ) : (
+        <FlatList
+          data={referrals}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={[styles.referralItem, { backgroundColor: themeColors.card }]}>
+              <Text style={[styles.referralText, { color: themeColors.text }]}>{item.referrer}</Text>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -72,18 +89,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  input: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
-  },
   button: {
     padding: 15,
     borderRadius: 8,
@@ -99,6 +104,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  noReferralsText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 20,
   },
   referralItem: {
     padding: 15,

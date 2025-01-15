@@ -143,13 +143,17 @@ class AuthManager {
     }
   }
 
-  isAuthenticated(): boolean {
-    if (typeof window === 'undefined') {
-      return false; // Assume not authenticated on the server
+
+  async getUser() {
+    try {
+      const response = await api.get('/users/')
+      return response.data[0]
+    } catch (error) {
+      console.error('Failed to fetch user', error)
+      handleApiError(error as AxiosError<ApiErrorResponse>);
+      throw error      
     }
-    return !!AsyncStorage.getItem('accessToken');
   }
 }
-
 const authManager = new AuthManager();
 export default authManager;

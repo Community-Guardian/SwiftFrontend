@@ -12,7 +12,7 @@ import { LogsProvider } from '@/context/LogsContext';
 import { FeedbackProvider } from '@/context/FeedbackContext';
 import { ArticlesProvider } from '@/context/ArticlesContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
-
+import { ReferralsProvider } from '@/context/ReferralsContext';
 function AppContent() {
   const { theme } = useTheme();
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
@@ -99,7 +99,9 @@ export default function TabLayout() {
             <FeedbackProvider>
               <ArticlesProvider>
                 <NotificationsProvider>
-                  <AppContent />
+                  <ReferralsProvider>
+                    <AppContent />
+                  </ReferralsProvider>
                 </NotificationsProvider>
               </ArticlesProvider>
             </FeedbackProvider>

@@ -223,3 +223,9 @@ export const UPDATE_LOG_URL = (id: number) => `${BASE_URL}/logs/${id}/`;
  * Delete a specific log by ID.
  */
 export const DELETE_LOG_URL = (id: number) => `${BASE_URL}/logs/${id}/`;
+
+
+export const GET_REFERRALS_URL = `${BASE_URL}/referrals/`;
+export const CREATE_REFERRAL_URL = `${BASE_URL}/referrals/`;
+export const GET_REWARDS_URL = `${BASE_URL}/rewards/`;
+export const CREATE_REWARD_URL = `${BASE_URL}/rewards/`;
