@@ -1,7 +1,8 @@
 "use client"
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import AuthManager from '../handler/AuthManager';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'expo-router';
+
 interface AuthContextProps {
   isAuthenticated: boolean;
   loading: boolean;
@@ -27,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await AuthManager.login(email, password);
       setIsAuthenticated(true);
-      router.push('/admin/')
     } catch (error) {
       console.error('Login failed', error);
       throw new Error("Login failed, try again");

@@ -16,6 +16,7 @@ export const Sidebar = ({ closeSidebar }) => {
     { icon: 'document-text', title: 'Privacy Policy', action: () => router.push('/privacy-policy') },
     { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
     { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
+    { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
     { icon: 'log-out', title: 'Log Out', action: () => router.push('/login') },
   ];
 

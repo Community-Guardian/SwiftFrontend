@@ -47,8 +47,8 @@ interface PaymentsContextProps {
   createPayment: (paymentData: Partial<Payment>) => Promise<void>;
   updatePayment: (id: string, paymentData: Partial<Payment>) => Promise<void>;
   deletePayment: (id: string) => Promise<void>;
-  createMpesaPaymentIntent: (serviceId: number, phoneNumber: string) => Promise<void>;
-  refundPayment: (paymentId: string, refundAmount: number, phoneNumber: string) => Promise<void>;
+  createMpesaPaymentIntent: (serviceId: number, phone_number: string) => Promise<void>;
+  refundPayment: (paymentId: string, refundAmount: number, phone_number: string) => Promise<void>;
 }
 
 const PaymentsContext = createContext<PaymentsContextProps | undefined>(undefined);
@@ -109,10 +109,10 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const createMpesaPaymentIntent = async (serviceId: number, phoneNumber: string) => {
+  const createMpesaPaymentIntent = async (serviceId: number, phone_number: string) => {
     setLoading(true);
     try {
-      await paymentsManager.createMpesaPaymentIntent(serviceId, phoneNumber);
+      await paymentsManager.createMpesaPaymentIntent(serviceId, phone_number);
     } catch (error) {
       console.error('Failed to create Mpesa payment intent', error);
     } finally {
@@ -120,10 +120,10 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const refundPayment = async (paymentId: string, refundAmount: number, phoneNumber: string) => {
+  const refundPayment = async (paymentId: string, refundAmount: number, phone_number: string) => {
     setLoading(true);
     try {
-      await paymentsManager.refundPayment(paymentId, refundAmount, phoneNumber);
+      await paymentsManager.refundPayment(paymentId, refundAmount, phone_number);
     } catch (error) {
       console.error('Failed to refund payment', error);
     } finally {

@@ -1,5 +1,20 @@
-import { BASE_URL } from '@/handler/apiConfig';
+import { BASE_URL,REFRESH_TOKEN_URL } from '@/handler/apiConfig';
 import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  user_type: string;
+  is_staff: boolean;
+  is_superuser: boolean;
+  date_joined: string;
+  last_login: string;
+}
 
 // Define the error response structure
 interface ApiErrorResponse {
@@ -28,7 +43,7 @@ interface ApiErrorResponse {
   api.interceptors.request.use(
     async (config: AxiosRequestConfig) => {
       try {
-        const token = await localStorage.getItem('accessToken');
+        const token = await AsyncStorage.getItem('accessToken');
   
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
@@ -56,30 +71,30 @@ interface ApiErrorResponse {
         originalRequest._retry = true;
   
         try {
-          const refreshToken = await localStorage.getItem('refreshToken');
+          const refreshToken = await AsyncStorage.getItem('refreshToken');
   
           if (refreshToken) {
             const response = await api.post(REFRESH_TOKEN_URL, { refresh: refreshToken });
   
             if (response.status === 200) {
-              await localStorage.setItem('accessToken', response.data.access);
+              await AsyncStorage.setItem('accessToken', response.data.access);
               if (originalRequest.headers) {
                 originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
               }
               return api(originalRequest);
             } else {
-              await localStorage.removeItem('accessToken');
-              await localStorage.removeItem('refreshToken');
+              await AsyncStorage.removeItem('accessToken');
+              await AsyncStorage.removeItem('refreshToken');
             }
           }
   
-          await localStorage.removeItem('accessToken');
-          await localStorage.removeItem('refreshToken');
+          await AsyncStorage.removeItem('accessToken');
+          await AsyncStorage.removeItem('refreshToken');
           return Promise.reject(error);
         } catch (refreshError) {
           console.error('Error refreshing token:', refreshError);
-          await localStorage.removeItem('accessToken');
-          await localStorage.removeItem('refreshToken');
+          await AsyncStorage.removeItem('accessToken');
+          await AsyncStorage.removeItem('refreshToken');
           return Promise.reject(refreshError);
         }
       }
@@ -94,6 +109,7 @@ class UsersManager {
       const response = await api.get('/users/')
       return response.data
     } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>); 
       console.error('Failed to fetch users', error)
       throw error
     }
@@ -104,6 +120,7 @@ class UsersManager {
       const response = await api.post('/users/', userData)
       return response.data
     } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>); 
       console.error('Failed to create user', error)
       throw error
     }
@@ -114,6 +131,7 @@ class UsersManager {
       const response = await api.put(`/users/${id}/`, userData)
       return response.data
     } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>); 
       console.error('Failed to update user', error)
       throw error
     }
@@ -123,6 +141,7 @@ class UsersManager {
     try {
       await api.delete(`/users/${id}/`)
     } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>); 
       console.error('Failed to delete user', error)
       throw error
     }

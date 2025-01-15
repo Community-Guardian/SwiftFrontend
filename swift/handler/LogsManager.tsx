@@ -6,6 +6,7 @@ import {
   DELETE_LOG_URL ,
   REFRESH_TOKEN_URL
 } from '@/handler/apiConfig';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the response data structure for logs
 interface Log {
@@ -43,7 +44,7 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config: AxiosRequestConfig) => {
     try {
-      const token = await localStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('accessToken');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -70,30 +71,30 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = await localStorage.getItem('refreshToken');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
 
         if (refreshToken) {
           const response = await api.post(REFRESH_TOKEN_URL, { refresh: refreshToken });
 
           if (response.status === 200) {
-            await localStorage.setItem('accessToken', response.data.access);
+            await AsyncStorage.setItem('accessToken', response.data.access);
             if (originalRequest.headers) {
               originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
             }
             return api(originalRequest);
           } else {
-            await localStorage.removeItem('accessToken');
-            await localStorage.removeItem('refreshToken');
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
           }
         }
 
-        await localStorage.removeItem('accessToken');
-        await localStorage.removeItem('refreshToken');
+        await AsyncStorage.removeItem('accessToken');
+        await AsyncStorage.removeItem('refreshToken');
         return Promise.reject(error);
       } catch (refreshError) {
         console.error('Error refreshing token:', refreshError);
-        await localStorage.removeItem('accessToken');
-        await localStorage.removeItem('refreshToken');
+        await AsyncStorage.removeItem('accessToken');
+        await AsyncStorage.removeItem('refreshToken');
         return Promise.reject(refreshError);
       }
     }

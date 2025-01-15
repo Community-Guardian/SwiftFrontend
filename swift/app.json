@@ -15,7 +15,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/splash.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3940256099942544/9214589741"
+      },
+      "package": "com.nrad8394.swift"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +40,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "048db6f7-e818-48eb-8ad8-b007975ba21b"
+      }
     }
   }
 }

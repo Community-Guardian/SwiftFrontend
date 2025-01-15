@@ -58,8 +58,8 @@ export default function PrivacyPolicyScreen() {
         </Text>
         <Text style={[styles.text, { color: themeColors.text }]}>
           If you have any questions about this Privacy Policy, please contact us at:
-          {'\n'}Email: privacy@tradingapp.com
-          {'\n'}Phone: +1 (555) 123-4567
+          {'\n'}Email: Swift@tradingapp.com
+          {'\n'}Phone: +254 716549814
         </Text>
       </View>
     </ScrollView>

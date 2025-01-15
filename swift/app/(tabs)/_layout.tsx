@@ -1,13 +1,27 @@
-import { Tabs } from 'expo-router';
-import { useTheme } from '../../context/ThemeContext';
+import { Tabs,useRouter } from 'expo-router';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { TouchableOpacity, Text } from 'react-native';
+import { ThemeProvider,useTheme } from '@/context/ThemeContext';
+import { ConnectivityProvider, useConnectivity } from '@/context/ConnectivityContext';
+import { PermissionsProvider } from '@/context/PermissionsContext ';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { PaymentsProvider } from '@/context/PaymentsContext';
+import { ServicesProvider } from '@/context/ServicesContext';
+import { LogsProvider } from '@/context/LogsContext';
+import { FeedbackProvider } from '@/context/FeedbackContext';
+import { ArticlesProvider } from '@/context/ArticlesContext';
+import { NotificationsProvider } from '@/context/NotificationsContext';
 
-export default function TabLayout() {
+function AppContent() {
   const { theme } = useTheme();
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const { isAuthenticated } = useAuth(); // Check if user is authenticated
+  const router = useRouter()
+  if (!isAuthenticated) {
+    // If user is not authenticated, redirect to login or show a different screen
+    router.push('/(auth)/index')
+  }
   return (
     <Tabs
       screenOptions={{
@@ -65,19 +79,47 @@ export default function TabLayout() {
           headerLeft: () => <BackButton />,
         }}
       />
+    <Tabs.Screen
+        name="earn"
+        options={{
+          headerTitle: 'Earn with us',
+          title: 'earn',
+          tabBarIcon: ({ color }) => <Ionicons name="cash" size={24} color={color} />,
+          headerLeft: () => <BackButton />,
+        }}
+      />
     </Tabs>
   );
+}
+export default function TabLayout() {
+  return (
+      <PaymentsProvider>
+        <ServicesProvider>
+          <LogsProvider>
+            <FeedbackProvider>
+              <ArticlesProvider>
+                <NotificationsProvider>
+                  <AppContent />
+                </NotificationsProvider>
+              </ArticlesProvider>
+            </FeedbackProvider>
+          </LogsProvider>
+        </ServicesProvider>
+      </PaymentsProvider>
+   );
 }
 
 function BackButton() {
   const router = useRouter();
-
+  const { theme } = useTheme();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const color = currentTheme.text;
   return (
     <TouchableOpacity
       onPress={() => router.replace('/(tabs)')} // Navigate to the "Home" screen
       style={{ marginLeft: 20 }}
     >
-      <Ionicons name="arrow-back-circle-outline" size={26} color="#2196F3" />
+      <Ionicons name="arrow-back" size={26} color={color} />
     </TouchableOpacity>
   );
 }

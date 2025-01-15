@@ -1,47 +1,30 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TextInput, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
-
-const courses = [
-  {
-    id: '1',
-    title: "Beginer's Classes",
-    duration: '3 Months',
-    price: '250 USD',
-    rating: 5,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Enroll%20Class-ib00OJFLtbxR4bmc2FKeDsVT1eQ3JQ.png',
-  },
-  {
-    id: '2',
-    title: 'Advanced Classes',
-    duration: '3 Months',
-    price: '300 USD',
-    rating: 5,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Enroll%20Class-ib00OJFLtbxR4bmc2FKeDsVT1eQ3JQ.png',
-  },
-  {
-    id: '3',
-    title: 'Algorithm Trading Classes',
-    duration: '3 Months',
-    price: '500 USD',
-    rating: 5,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Enroll%20Class-ib00OJFLtbxR4bmc2FKeDsVT1eQ3JQ.png',
-  },
-  {
-    id: '4',
-    title: 'Pro Trading Classes',
-    duration: '3 Months',
-    price: '500 USD',
-    rating: 5,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Enroll%20Class-ib00OJFLtbxR4bmc2FKeDsVT1eQ3JQ.png',
-  },
-];
+import { useServices } from '../../context/ServicesContext';
+import PayNowModal from '../../components/PayNowModal';
+const DEFAULT_IMAGE =
+  'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
 
 export default function EnrollScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const { services, getServices } = useServices();
+  const [filteredServices, setFilteredServices] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedService, setSelectedService] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    getServices();
+  }, []);
+
+  useEffect(() => {
+    const filtered = services.filter(service => service.service_type.name === 'Trading Classes');
+    setFilteredServices(filtered);
+  }, [services]);
 
   const renderStars = (rating: number) => {
     return [...Array(rating)].map((_, i) => (
@@ -49,35 +32,45 @@ export default function EnrollScreen() {
     ));
   };
 
+  const handleSearch = (text: string) => {
+    setSearchQuery(text);
+    const filtered = services.filter(service =>
+      service.name.toLowerCase().includes(text.toLowerCase()) &&
+      service.service_type.name === 'Trading Classes'
+    );
+    setFilteredServices(filtered);
+  };
+
+  const handlePayNow = (service) => {
+    setSelectedService(service);
+    setModalVisible(true);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: themeColors.text }]}>
-          ENROLL FOR CLASSES
-        </Text>
-      </View>
-
       <View style={[styles.searchContainer, { backgroundColor: themeColors.card }]}>
         <Ionicons name="search" size={20} color={themeColors.text} />
         <TextInput
           placeholder="Search..."
           placeholderTextColor={themeColors.text}
           style={[styles.searchInput, { color: themeColors.text }]}
+          value={searchQuery}
+          onChangeText={handleSearch}
         />
       </View>
 
       <FlatList
-        data={courses}
-        keyExtractor={(item) => item.id}
+        data={filteredServices}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
-            <Image source={{ uri: item.image }} style={styles.courseImage} />
+            <Image source={{ uri: item.image|| DEFAULT_IMAGE }} style={styles.courseImage} />
             <View style={styles.courseInfo}>
               <Text style={[styles.courseTitle, { color: themeColors.text }]}>
-                {item.title}
+                {item.name}
               </Text>
               <View style={styles.ratingContainer}>
-                {renderStars(item.rating)}
+                {renderStars(item.rating||5)}
               </View>
               <View style={styles.courseDetails}>
                 <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
@@ -87,10 +80,21 @@ export default function EnrollScreen() {
                   {item.price}
                 </Text>
               </View>
+              <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.payNowButton}>
+                <Text style={styles.payNowButtonText}>Pay Now</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
       />
+
+      {selectedService && (
+        <PayNowModal
+          isVisible={isModalVisible}
+          onClose={() => setModalVisible(false)}
+          service={selectedService}
+        />
+      )}
     </View>
   );
 }
@@ -98,13 +102,6 @@ export default function EnrollScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -153,5 +150,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  payNowButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#2196F3',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  payNowButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
-
