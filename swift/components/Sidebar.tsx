@@ -3,17 +3,20 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'rea
 import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export const Sidebar = ({ closeSidebar }) => {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const router = useRouter();
 
   const menuItems = [
-    { icon: 'home', title: 'Home', action: () => {} },
-    { icon: 'people', title: 'About Us', action: () => {} },
-    { icon: 'document-text', title: 'Privacy Policy', action: () => {} },
-    { icon: 'book', title: 'Read Blogs', action: () => {} },
-    { icon: 'log-out', title: 'Log Out', action: () => {} },
+    { icon: 'home', title: 'Home', action: () => router.push('/') },
+    { icon: 'people', title: 'About Us', action: () => router.push('/about') },
+    { icon: 'document-text', title: 'Privacy Policy', action: () => router.push('/privacy-policy') },
+    { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
+    { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
+    { icon: 'log-out', title: 'Log Out', action: () => router.push('/login') },
   ];
 
   return (
@@ -21,7 +24,6 @@ export const Sidebar = ({ closeSidebar }) => {
       style={[styles.container, { backgroundColor: themeColors.background }]}
       contentContainerStyle={styles.content}
     >
-      {/* Profile Section */}
       <View style={styles.profileSection}>
         <Image
           source={{
@@ -32,13 +34,15 @@ export const Sidebar = ({ closeSidebar }) => {
         <Text style={[styles.name, { color: themeColors.text }]}>LUKE SHAW</Text>
       </View>
 
-      {/* Menu Items */}
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.menuItem, { borderBottomColor: themeColors.border }]}
-            onPress={item.action}
+            onPress={() => {
+              item.action();
+              closeSidebar();
+            }}
           >
             <Ionicons name={item.icon as any} size={24} color={themeColors.text} />
             <Text style={[styles.menuText, { color: themeColors.text }]}>{item.title}</Text>
@@ -46,7 +50,6 @@ export const Sidebar = ({ closeSidebar }) => {
         ))}
       </View>
 
-      {/* Close Button */}
       <TouchableOpacity onPress={closeSidebar} style={styles.closeButton}>
         <Ionicons name="close" size={28} color={themeColors.text} />
       </TouchableOpacity>
@@ -107,3 +110,4 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 });
+
