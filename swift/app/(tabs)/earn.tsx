@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,12 +9,17 @@ export default function EarnScreen() {
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const [email, setEmail] = useState('');
   const [referrals, setReferrals] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRefer = () => {
     if (email) {
-      setReferrals([...referrals, email]);
-      setEmail('');
-      Alert.alert('Success', 'Referral sent successfully!');
+      setIsLoading(true);  // Set loading state to true
+      setTimeout(() => {
+        setReferrals([...referrals, email]);
+        setEmail('');
+        setIsLoading(false);  // Set loading state to false after operation
+        Alert.alert('Success', 'Referral sent successfully!');
+      }, 1500);  // Simulate delay for the referral process
     } else {
       Alert.alert('Error', 'Please enter an email address.');
     }
@@ -41,6 +46,9 @@ export default function EarnScreen() {
       <TouchableOpacity onPress={handleRefer} style={[styles.button, { backgroundColor: themeColors.primary }]}>
         <Text style={styles.buttonText}>Refer Now</Text>
       </TouchableOpacity>
+
+      {/* Loading indicator */}
+      {isLoading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />}
 
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
       <FlatList
@@ -107,5 +115,8 @@ const styles = StyleSheet.create({
   },
   referralText: {
     fontSize: 16,
+  },
+  loadingIndicator: {
+    marginVertical: 20,
   },
 });

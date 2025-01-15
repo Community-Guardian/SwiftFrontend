@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Switch, ActivityIndicator } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ export default function SettingsScreen() {
   const { theme, toggleTheme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
 
+  const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
   const [tradingAlerts, setTradingAlerts] = useState(true);
@@ -48,6 +49,23 @@ export default function SettingsScreen() {
       ],
     },
   ];
+
+  useEffect(() => {
+    // Simulate a loading delay (e.g., fetching from a server or local storage)
+    const timer = setTimeout(() => {
+      setLoading(false); // Simulate finished loading after 2 seconds
+    }, 2000);
+
+    return () => clearTimeout(timer); // Cleanup on unmount
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+        <ActivityIndicator size="large" color={themeColors.text} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView 
@@ -96,6 +114,8 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 16,
@@ -137,4 +157,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

@@ -22,6 +22,7 @@
     "@react-navigation/native": "^7.0.14",
     "axios": "^1.7.9",
     "expo": "~52.0.25",
+    "expo-ads-admob": "^13.0.0",
     "expo-blur": "~14.0.2",
     "expo-checkbox": "^4.0.1",
     "expo-constants": "~17.0.4",

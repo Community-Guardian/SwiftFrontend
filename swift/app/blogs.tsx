@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,6 +37,25 @@ const blogPosts = [
 export default function BlogsScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate a delay to load blog posts
+    const timer = setTimeout(() => {
+      setLoading(false); // Set loading to false after 2 seconds
+    }, 2000);
+
+    return () => clearTimeout(timer); // Clear the timeout on unmount
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: themeColors.background }]}>
+        <ActivityIndicator size="large" color={themeColors.primary} />
+        <Text style={[styles.loadingText, { color: themeColors.text }]}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView 
@@ -148,5 +167,15 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 14,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginTop: 10,
+  },
 });
-

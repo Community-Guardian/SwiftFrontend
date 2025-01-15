@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useServices } from '../../context/ServicesContext';
 import PayNowModal from '../../components/PayNowModal';
+
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
 
@@ -16,14 +17,18 @@ export default function InvestScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     getServices();
   }, []);
 
   useEffect(() => {
-    const filtered = services.filter(service => service.service_type.name === 'Investment Plans');
-    setFilteredServices(filtered);
+    if (services.length > 0) {
+      const filtered = services.filter(service => service.service_type.name === 'Investment Plans');
+      setFilteredServices(filtered);
+      setIsLoading(false); // Stop loading once services are fetched
+    }
   }, [services]);
 
   const handleSearch = (text: string) => {
@@ -61,28 +66,36 @@ export default function InvestScreen() {
         With Interest of 5% Per Week
       </Text>
 
-      <FlatList
-        data={filteredServices}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.investmentCard, { backgroundColor: themeColors.card }]}>
-            <View style={styles.investmentInfo}>
-              <View style={[styles.amountContainer, { backgroundColor: themeColors.primary }]}>
-                <Text style={styles.amount}>KSH {item.price}</Text>
+      {/* Loading Indicator */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          data={filteredServices}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={[styles.investmentCard, { backgroundColor: themeColors.card }]}>
+              <Text style={[styles.serviceName, { color: themeColors.text }]}>
+                {item.name}
+              </Text>
+              <View style={styles.investmentInfo}>
+                <View style={[styles.amountContainer, { backgroundColor: themeColors.primary }]}>
+                  <Text style={styles.amount}>KSH {item.price}</Text>
+                </View>
+                <View style={[styles.durationContainer, { backgroundColor: themeColors.secondary }]}>
+                  <Text style={styles.duration}>{item.duration}</Text>
+                </View>
               </View>
-              <View style={[styles.durationContainer, { backgroundColor: themeColors.secondary }]}>
-                <Text style={styles.duration}>{item.duration}</Text>
-              </View>
+              <TouchableOpacity
+                onPress={() => handlePayNow(item)}
+                style={[styles.investButton, { backgroundColor: themeColors.primary }]}
+              >
+                <Text style={styles.investButtonText}>Invest With Us</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => handlePayNow(item)}
-              style={[styles.investButton, { backgroundColor: themeColors.primary }]}
-            >
-              <Text style={styles.investButtonText}>Invest With Us</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
       {selectedService && (
         <PayNowModal
@@ -121,6 +134,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
   },
+  serviceName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
   investmentInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -156,5 +174,9 @@ const styles = StyleSheet.create({
   investButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  loadingIndicator: {
+    marginTop: 30,
+    alignSelf: 'center',
   },
 });

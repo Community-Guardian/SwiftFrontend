@@ -1,11 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 
 export default function PrivacyPolicyScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const [loading, setLoading] = useState(true);
 
   const sections = [
     {
@@ -30,13 +31,30 @@ export default function PrivacyPolicyScreen() {
     },
   ];
 
+  useEffect(() => {
+    // Simulate a loading delay
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // 2 seconds delay
+
+    return () => clearTimeout(timer); // Cleanup on unmount
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+        <ActivityIndicator size="large" color={themeColors.text} />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
       contentContainerStyle={styles.content}
     >
       <Text style={[styles.title, { color: themeColors.text }]}>Privacy Policy</Text>
-      
+
       <Text style={[styles.lastUpdated, { color: themeColors.text }]}>
         Last Updated: January 2024
       </Text>
@@ -69,6 +87,8 @@ export default function PrivacyPolicyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 16,
@@ -109,4 +129,3 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
-

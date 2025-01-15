@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Card } from '../../components/Card';
 import { Sidebar } from '../../components/Sidebar';
@@ -9,11 +9,27 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
   const [isSidebarVisible, setSidebarVisible] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
 
+  useEffect(() => {
+    // Simulate an initialization process
+    const timeout = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const toggleSidebar = () => setSidebarVisible((prev) => !prev);
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.center, { backgroundColor: themeColors.background }]}>
+        <ActivityIndicator size="large" color={themeColors.primary} />
+        <Text style={[styles.loadingText, { color: themeColors.text }]}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
@@ -47,10 +63,10 @@ export default function HomeScreen() {
 
       <View style={styles.grid}>
         {[
-          { title: 'Enroll for Courses', route: '/enroll' as const, color: themeColors.secondary },
-          { title: 'Buy Signals', route: '/subscribe' as const, color: themeColors.primary },
-          { title: 'Invest With Us', route: '/invest' as const, color: themeColors.primary },
-          { title: 'Earn With Us', route: '/earn' as const, color: themeColors.secondary },
+          { title: 'Enroll for Courses', route: '/enroll', color: themeColors.secondary },
+          { title: 'Buy Signals', route: '/subscribe', color: themeColors.primary },
+          { title: 'Invest With Us', route: '/invest', color: themeColors.primary },
+          { title: 'Earn With Us', route: '/earn', color: themeColors.secondary },
         ].map((item, index) => (
           <Card
             key={index}
@@ -60,16 +76,6 @@ export default function HomeScreen() {
           />
         ))}
       </View>
-
-      {/* Google Ad Space */}
-      {/* <View style={styles.adContainer}>
-        <AdMobBanner
-          bannerSize="fullBanner"
-          adUnitID="ca-app-pub-3940256099942544/9214589741" // Replace with your own Ad Unit ID
-          servePersonalizedAds // Enable personalized ads
-          onDidFailToReceiveAdWithError={(error) => console.error('Ad failed to load:', error)}
-        />
-      </View> */}
     </View>
   );
 }
@@ -79,6 +85,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 24,
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -118,8 +128,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  adContainer: {
+  loadingText: {
     marginTop: 16,
-    alignItems: 'center',
+    fontSize: 16,
+    fontWeight: '500',
   },
 });

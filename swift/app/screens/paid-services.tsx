@@ -23,10 +23,12 @@ export default function PaidServicesScreen() {
   const [paidServices, setPaidServices] = useState([]);
 
   useEffect(() => {
+    // Trigger the loading state and fetch data
     getPayments();
   }, []);
 
   useEffect(() => {
+    // Map payments data to services after fetching
     const services = payments.map((payment) => payment.service);
     setPaidServices(services);
   }, [payments]);
@@ -35,6 +37,7 @@ export default function PaidServicesScreen() {
     Linking.openURL(link);
   };
 
+  // Show loading indicator while the data is being fetched
   if (loading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: themeColors.background }]}>

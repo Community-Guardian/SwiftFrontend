@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useServices } from '../../context/ServicesContext';
 import PayNowModal from '../../components/PayNowModal';
+
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
 
@@ -16,14 +17,18 @@ export default function EnrollScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     getServices();
   }, []);
 
   useEffect(() => {
-    const filtered = services.filter(service => service.service_type.name === 'Trading Classes');
-    setFilteredServices(filtered);
+    if (services.length > 0) {
+      const filtered = services.filter(service => service.service_type.name === 'Trading Classes');
+      setFilteredServices(filtered);
+      setIsLoading(false); // Stop loading when data is available
+    }
   }, [services]);
 
   const renderStars = (rating: number) => {
@@ -48,6 +53,7 @@ export default function EnrollScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      {/* Search Bar */}
       <View style={[styles.searchContainer, { backgroundColor: themeColors.card }]}>
         <Ionicons name="search" size={20} color={themeColors.text} />
         <TextInput
@@ -59,35 +65,41 @@ export default function EnrollScreen() {
         />
       </View>
 
-      <FlatList
-        data={filteredServices}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
-            <Image source={{ uri: item.image|| DEFAULT_IMAGE }} style={styles.courseImage} />
-            <View style={styles.courseInfo}>
-              <Text style={[styles.courseTitle, { color: themeColors.text }]}>
-                {item.name}
-              </Text>
-              <View style={styles.ratingContainer}>
-                {renderStars(item.rating||5)}
-              </View>
-              <View style={styles.courseDetails}>
-                <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
-                  {item.duration}
+      {/* Loading Spinner */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          data={filteredServices}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
+              <Image source={{ uri: item.image || DEFAULT_IMAGE }} style={styles.courseImage} />
+              <View style={styles.courseInfo}>
+                <Text style={[styles.courseTitle, { color: themeColors.text }]}>
+                  {item.name}
                 </Text>
-                <Text style={[styles.price, { color: themeColors.text }]}>
-                  {item.price}
-                </Text>
+                <View style={styles.ratingContainer}>
+                  {renderStars(item.rating || 5)}
+                </View>
+                <View style={styles.courseDetails}>
+                  <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
+                    {item.duration}
+                  </Text>
+                  <Text style={[styles.price, { color: themeColors.text }]}>
+                    {item.price}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.payNowButton}>
+                  <Text style={styles.payNowButtonText}>Pay Now</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.payNowButton}>
-                <Text style={styles.payNowButtonText}>Pay Now</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
+      {/* Pay Now Modal */}
       {selectedService && (
         <PayNowModal
           isVisible={isModalVisible}
@@ -160,5 +172,9 @@ const styles = StyleSheet.create({
   payNowButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  loadingIndicator: {
+    marginTop: 30,
+    alignSelf: 'center',
   },
 });

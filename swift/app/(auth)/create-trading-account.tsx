@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import { useRouter } from 'expo-router';
 import { useCreateTradingAccount } from '@/context/CreateTradingAccountContext';
 import { CustomButton } from '@/components/CustomButton';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -24,10 +23,7 @@ const CreateTradingAccountScreen = () => {
   };
 
   return (
-    <LinearGradient
-      colors={['#4158D0', '#C850C0', '#FFCC70']}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <View style={styles.card}>
         <Ionicons name="wallet-outline" size={60} color="#4158D0" style={styles.icon} />
         <Text style={styles.title}>Create Trading Account</Text>
@@ -43,7 +39,7 @@ const CreateTradingAccountScreen = () => {
           <Text style={styles.skipButtonText}>Skip for now</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -53,13 +49,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#f7f7f7', // Replace gradient with solid color
   },
   card: {
     width: width * 0.9,
     maxWidth: 400,
     padding: 30,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'white', // Keep the card's background white
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -95,4 +92,3 @@ const styles = StyleSheet.create({
 });
 
 export default CreateTradingAccountScreen;
-

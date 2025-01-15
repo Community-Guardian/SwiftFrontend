@@ -34,10 +34,10 @@ export default function AuthScreen() {
       } else {
         await register(formData.email, formData.password, formData.password, 'customer');
         if (!hasSkipped) {
-          router.push('/create-trading-account');
+          router.push('/screens/verify-account');
         }
       }
-      router.push('/(auth)/create-trading-account');
+      router.push('/screens/verify-account');
     } catch (err: any) {
       setError(err.message);
     }
@@ -110,7 +110,7 @@ export default function AuthScreen() {
             )}
           </View>
 
-          <CustomButton title={isLogin ? 'Login' : 'Sign Up'} onPress={handleAuth} />
+          <CustomButton  loading={loading} title={isLogin ? 'Login' : 'Sign Up'} onPress={handleAuth} />
 
           <CustomButton
             title={isLogin ? 'Create a new account' : 'Already have an account? Login'}

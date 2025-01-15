@@ -8,6 +8,7 @@ import {
   Image,
   TouchableOpacity,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
@@ -26,14 +27,18 @@ export default function SubscribeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     getServices();
   }, []);
 
   useEffect(() => {
-    const filtered = services.filter((service) => service.service_type.name === 'Forex Signals');
-    setFilteredServices(filtered);
+    if (services.length > 0) {
+      const filtered = services.filter((service) => service.service_type.name === 'Forex Signals');
+      setFilteredServices(filtered);
+      setIsLoading(false); // Set loading to false after data is loaded
+    }
   }, [services]);
 
   const handleSearch = (text) => {
@@ -68,31 +73,35 @@ export default function SubscribeScreen() {
         />
       </View>
 
-
-      <FlatList
-        data={filteredServices}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.signalCard, { backgroundColor: themeColors.card }]}>
-            <Image
-              source={{ uri: item.image || DEFAULT_IMAGE }}
-              style={styles.signalImage}
-              resizeMode="cover"
-            />
-            <View style={styles.signalInfo}>
-              <View>
-                <Text style={[styles.signalName, { color: themeColors.text }]}>{item.name}</Text>
-                <Text style={[styles.price, { color: themeColors.primary }]}>
-                  Price: Ksh {item.price}
-                </Text>
+      {/* Loading Indicator */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          data={filteredServices}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={[styles.signalCard, { backgroundColor: themeColors.card }]}>
+              <Image
+                source={{ uri: item.image || DEFAULT_IMAGE }}
+                style={styles.signalImage}
+                resizeMode="cover"
+              />
+              <View style={styles.signalInfo}>
+                <View>
+                  <Text style={[styles.signalName, { color: themeColors.text }]}>{item.name}</Text>
+                  <Text style={[styles.price, { color: themeColors.primary }]}>
+                    Price: Ksh {item.price}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.subscribeButton}>
+                  <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.subscribeButton}>
-                <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
       {selectedService && (
         <PayNowModal
@@ -166,5 +175,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  loadingIndicator: {
+    marginTop: 30,
+    alignSelf: 'center',
   },
 });
