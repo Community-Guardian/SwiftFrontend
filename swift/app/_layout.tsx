@@ -6,10 +6,14 @@ import { PermissionsProvider } from '@/context/PermissionsContext ';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CreateTradingAccountProvider } from '@/context/CreateTradingAccountContext';
 
+
+
 function AppContent() {
   const { isConnected } = useConnectivity();
   const { isAuthenticated } = useAuth();
 
+
+  
   if (!isAuthenticated) {
     // Render authentication-related screens
     return (

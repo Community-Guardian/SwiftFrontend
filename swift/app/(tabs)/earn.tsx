@@ -53,6 +53,9 @@ export default function EarnScreen() {
         <Text style={styles.buttonText}>Share Referral Code</Text>
       </TouchableOpacity>
 
+      {/* Loading indicator */}
+      {isLoading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />}
+
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
       {referrals.length === 0 ? (
         <Text style={[styles.noReferralsText, { color: themeColors.text }]}>
@@ -117,5 +120,8 @@ const styles = StyleSheet.create({
   },
   referralText: {
     fontSize: 16,
+  },
+  loadingIndicator: {
+    marginVertical: 20,
   },
 });

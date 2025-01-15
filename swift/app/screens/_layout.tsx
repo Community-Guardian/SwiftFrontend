@@ -29,7 +29,11 @@ function AppContent() {
         name="paid-services" // Matches with the login.tsx screen
         options={{ title: 'Paid services',headerLeft: () => <BackButton />,
         }}
-      />     
+      />   
+      <Stack.Screen
+        name="verify-account" // Matches with the verify-account.tsx screen
+        options={{ title: 'Verify Account' }}
+      />   
     </Stack>
   );
 }
