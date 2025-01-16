@@ -4,7 +4,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   ActivityIndicator,
 } from "react-native";
@@ -19,6 +18,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { router } from "expo-router";
+import { CustomButton } from "@/components/CustomButton";
+
 interface ServiceType {
   id: number;
   name: string;
@@ -30,8 +31,8 @@ interface ServiceType {
 interface Service {
   id: number;
   name: string;
-  service_type: ServiceType; // Nested service type object
-  service_type_id: string; 
+  service_type: ServiceType;
+  service_type_id: string;
   price: number;
   description: string;
   link: string;
@@ -55,7 +56,6 @@ export default function VerifyAccountScreen() {
 
   useEffect(() => {
     if (services.length > 0) {
-      // Find the first matching service
       const match = services.find(
         (s) => s.service_type.name === "Activate your account"
       );
@@ -68,9 +68,20 @@ export default function VerifyAccountScreen() {
       setIsPaymentModalVisible(true);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: themeColors.background }]}>
+        <ActivityIndicator size="large" color={themeColors.primary} />
+      </View>
+    );
+  }
+
   if (!service) {
     router.push("/create-trading-account");
+    return null; // Prevent further rendering after navigation
   }
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
@@ -110,21 +121,13 @@ export default function VerifyAccountScreen() {
           </Text>
         </CardContent>
         <CardFooter>
-          {loading ? (
-            <ActivityIndicator size="large" color={themeColors.primary} />
-          ) : (
-            <TouchableOpacity
-              style={[
-                styles.verifyButton,
-                { backgroundColor: themeColors.primary },
-              ]}
-              onPress={handleVerification}
-              
-              disabled={!service} // Disable button if no service is available
-            >
-              <Text style={styles.verifyButtonText}>Verify Now</Text>
-            </TouchableOpacity>
-          )}
+          <CustomButton
+            title="Verify Now"
+            onPress={handleVerification}
+            variant="primary"
+            loading={loading}
+            disabled={!service}
+          />
         </CardFooter>
       </Card>
 
@@ -142,6 +145,11 @@ export default function VerifyAccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   card: {
     margin: 16,
@@ -175,18 +183,5 @@ const styles = StyleSheet.create({
   feeAmount: {
     fontSize: 20,
     fontWeight: "700",
-  },
-  verifyButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-  },
-  verifyButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
   },
 });
