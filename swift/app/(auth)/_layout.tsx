@@ -18,7 +18,7 @@ export default function AuthLayout() {
     />     
     <Stack.Screen
       name="forgot-password" // Matches with the signup.tsx screen
-      options={{ title: 'Sign Up' }}
+      options={{ title: 'Forgot Password' }}
     />
       
     </Stack>

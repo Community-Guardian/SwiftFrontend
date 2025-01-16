@@ -12,32 +12,67 @@ import { ThemeProvider,useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/styles/theme';
 import { TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+function BackButton() {
+  const router = useRouter();
+  const { theme } = useTheme();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const color = currentTheme.text;
+  return (
+    <TouchableOpacity
+      onPress={() => router.replace('/(tabs)')} // Navigate to the "Home" screen
+      style={{ marginLeft: 20 }}
+    >
+      <Ionicons name="arrow-back" size={26} color={color} />
+    </TouchableOpacity>
+  );
+}
 
-
+function AuthButton() {
+  const router = useRouter();
+  const { theme } = useTheme();
+  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
+  const color = currentTheme.text;
+  return (
+    <TouchableOpacity
+      onPress={() => router.replace('/(auth)')} // Navigate to the "Home" screen
+      style={{ marginLeft: 20 }}
+    >
+      <Ionicons name="arrow-back" size={26} color={color} />
+    </TouchableOpacity>
+  );
+}
 function AppContent() {
+  const { theme } = useTheme();
+  const themeColors = theme === 'light' ? lightTheme : darkTheme;
+
   return (
     <Stack
       screenOptions={{
-        headerShown: true, // Hide the header
+        headerStyle: {
+          backgroundColor: themeColors.background,
+        },
+        headerTintColor: themeColors.text,
+        headerTitleStyle: {
+          color: themeColors.text,
+        },
       }}
     >
       <Stack.Screen
-        name="OfflineScreen" // Matches with the login.tsx screen
+        name="OfflineScreen"
         options={{ title: 'Offline' }}
       />
       <Stack.Screen
-        name="paid-services" // Matches with the login.tsx screen
-        options={{ title: 'Paid services',headerLeft: () => <BackButton />,
-        }}
-      />   
+        name="paid-services"
+        options={{ title: 'Paid services', headerLeft: () => <BackButton /> }}
+      />
       <Stack.Screen
-        name="verify-account" // Matches with the verify-account.tsx screen
-        options={{ title: 'Verify Account' }}
-      />  
+        name="verify-account"
+        options={{ title: 'Verify Account', headerLeft: () => <AuthButton /> }}
+      />
       <Stack.Screen
-        name="UpdateUserProfile" // Matches with the verify-account.tsx screen
-        options={{ title: 'Update User Profile' }}
-      />  
+        name="UpdateUserProfile"
+        options={{ title: 'Update User Profile', headerLeft: () => <BackButton /> }}
+      />
     </Stack>
   );
 }
@@ -57,18 +92,4 @@ export default function ScreensLayout() {
     </ServicesProvider>
 </PaymentsProvider>
 )
-}
-function BackButton() {
-  const router = useRouter();
-  const { theme } = useTheme();
-  const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
-  const color = currentTheme.text;
-  return (
-    <TouchableOpacity
-      onPress={() => router.replace('/(tabs)')} // Navigate to the "Home" screen
-      style={{ marginLeft: 5 }}
-    >
-      <Ionicons name="arrow-back" size={26} color={color} />
-    </TouchableOpacity>
-  );
 }

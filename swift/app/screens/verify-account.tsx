@@ -18,13 +18,35 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+interface ServiceType {
+  id: number;
+  name: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  service_type: ServiceType; // Nested service type object
+  service_type_id: string; 
+  price: number;
+  description: string;
+  link: string;
+  duration: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  image: string;
+}
 
 export default function VerifyAccountScreen() {
   const { theme } = useTheme();
   const themeColors = theme === "light" ? lightTheme : darkTheme;
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const { services, getServices, loading } = useServices();
-  const [service, setService] = useState(null); // Holds the first matching service
+  const [service, setService] = useState<Service | null>(null);
 
   useEffect(() => {
     getServices();
@@ -42,7 +64,7 @@ export default function VerifyAccountScreen() {
 
   const handleVerification = () => {
     if (service) {
-      setIsModalVisible(true);
+      setIsPaymentModalVisible(true);
     }
   };
 
@@ -104,8 +126,8 @@ export default function VerifyAccountScreen() {
 
       {service && (
         <PayModal
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
+          isVisible={setIsPaymentModalVisible}
+          onClose={() => setIsPaymentModalVisible(false)}
           service={service}
         />
       )}

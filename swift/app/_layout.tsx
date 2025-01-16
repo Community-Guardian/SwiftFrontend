@@ -18,7 +18,9 @@ function AppContent() {
   if (!isAuthenticated) {
     // Render authentication-related screens
     return (
-      <Stack>
+      <Stack screenOptions={{
+        headerShown: false, // Hide the header
+      }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack>
     );
@@ -26,7 +28,9 @@ function AppContent() {
   if (isAuthenticated) {
     // Render other-related screens
     return (
-      <Stack>
+      <Stack screenOptions={{
+        headerShown: false, // Hide the header
+      }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="screens" options={{ headerShown: false }} />      
       </Stack>
@@ -40,7 +44,9 @@ function AppContent() {
 
   // Render main application when authenticated and connected
   return (
-    <Stack>
+    <Stack screenOptions={{
+      headerShown: false, // Hide the header
+    }}>
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="screens" options={{ headerShown: false }} />

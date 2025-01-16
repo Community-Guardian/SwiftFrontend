@@ -1,26 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useAuth } from '../../context/AuthContext';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  user_type: string;
-  is_staff: boolean;
-  is_superuser: boolean;
-  date_joined: string;
-  last_login: string;
-  image: string;
-  referral_code: string;
-  is_verified: boolean;
-  referred_by: string;
-}
 
 export default function UpdateUserProfileScreen() {
   const { theme } = useTheme();
@@ -30,17 +13,18 @@ export default function UpdateUserProfileScreen() {
   const [email, setEmail] = useState(user?.email || '');
   const [firstName, setFirstName] = useState(user?.first_name || '');
   const [lastName, setLastName] = useState(user?.last_name || '');
-  const [referralCode, setReferralCode] = useState(user?.referral_code || '');
+  const [referralCode] = useState(user?.referral_code || '');
   const [image, setImage] = useState(user?.image || '');
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const handleUpdate = async () => {
     try {
       if (user) {
         await updateUser(user.id, { username, email, first_name: firstName, last_name: lastName, referral_code: referralCode, image });
-        Alert.alert('Success', 'Profile updated successfully!');
+        setMessage({ text: 'Profile updated successfully!', type: 'success' });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile.');
+      setMessage({ text: 'Failed to update profile.', type: 'error' });
     }
   };
 
@@ -52,14 +36,28 @@ export default function UpdateUserProfileScreen() {
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImage(result.uri);
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImage(result.assets[0].uri);
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <Text style={[styles.title, { color: themeColors.text }]}>Update Profile</Text>
+
+      {message && (
+        <Text
+          style={[
+            styles.message,
+            {
+              color: message.type === 'success' ? themeColors.success : themeColors.error,
+            },
+          ]}
+        >
+          {message.text}
+        </Text>
+      )}
+
       <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
         {image ? (
           <Image source={{ uri: image }} style={styles.avatar} />
@@ -67,6 +65,7 @@ export default function UpdateUserProfileScreen() {
           <Text style={[styles.imagePickerText, { color: themeColors.text }]}>Pick an Image</Text>
         )}
       </TouchableOpacity>
+
       <TextInput
         style={[styles.input, { color: themeColors.text, borderColor: themeColors.border }]}
         placeholder="Username"
@@ -100,7 +99,7 @@ export default function UpdateUserProfileScreen() {
         placeholder="Referral Code"
         placeholderTextColor={themeColors.text}
         value={referralCode}
-        onChangeText={setReferralCode}
+        editable={false}
       />
       <TouchableOpacity onPress={handleUpdate} style={[styles.button, { backgroundColor: themeColors.primary }]}>
         <Text style={styles.buttonText}>Update</Text>
@@ -119,6 +118,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
+  },
+  message: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
   },
   input: {
     width: '100%',

@@ -8,14 +8,36 @@ import PayNowModal from '../../components/PayNowModal';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
-
+  interface ServiceType {
+    id: number;
+    name: string;
+    icon: string;
+    created_at: string;
+    updated_at: string;
+  }
+  
+  interface Service {
+    id: number;
+    name: string;
+    service_type: ServiceType; // Nested service type object
+    service_type_id: string; 
+    price: number;
+    description: string;
+    link: string;
+    duration: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    image: string;
+  }
+  
 export default function EnrollScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { services, getServices } = useServices();
-  const [filteredServices, setFilteredServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState<Service[] | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
@@ -46,7 +68,7 @@ export default function EnrollScreen() {
     setFilteredServices(filtered);
   };
 
-  const handlePayNow = (service) => {
+  const handlePayNow = (service: Service) => {
     setSelectedService(service);
     setModalVisible(true);
   };
@@ -74,7 +96,7 @@ export default function EnrollScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
-              <Image source={{ uri: item.image || DEFAULT_IMAGE }} style={styles.courseImage} />
+              <Image source={{ uri: item?.image || DEFAULT_IMAGE }} style={styles.courseImage} />
               <View style={styles.courseInfo}>
                 <Text style={[styles.courseTitle, { color: themeColors.text }]}>
                   {item.name}

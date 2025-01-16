@@ -9,6 +9,7 @@ import Checkbox from 'expo-checkbox';
 import { useAuth } from '../../context/AuthContext';
 import { useCreateTradingAccount } from '../../context/CreateTradingAccountContext';
 import { useLogout } from '../../context/LogoutContext';
+import { FontAwesome } from '@expo/vector-icons';  // Import an icon library for toggle
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -28,14 +29,30 @@ export default function AuthScreen() {
   const [rememberMe, setRememberMeState] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);  // State for password visibility
 
   const handleAuth = async () => {
     try {
       if (isLogin) {
+        try{
         await login(formData.email, formData.password);
-        setRememberMe(rememberMe);
+        setRememberMe(rememberMe);          
+        }
+        catch(error){
+          setError('Failed to login! Please try again and check credentials.');
+        }
       } else {
+        try{
         await register(formData.email, formData.password, formData.password, 'customer');
+        }
+        catch(error){
+          if (error.email) {
+            setError(error.email);
+            return;
+          }
+          setError('Failed to register! Please try again');
+          return;
+        }
         if (!hasSkipped) {
           router.push('/screens/verify-account');
         }
@@ -51,7 +68,6 @@ export default function AuthScreen() {
         <Text style={[styles.title, { color: themeColors.text }]}>
           {isLogin ? 'Login to your account' : 'Sign Up'}
         </Text>
-
         <Text style={[styles.subtitle, { color: themeColors.text }]}>
           {isLogin ? 'Hello. Welcome back to your account' : 'Create a new account'}
         </Text>
@@ -64,21 +80,30 @@ export default function AuthScreen() {
             value={formData.email}
             onChangeText={(text) => setFormData({ ...formData, email: text })}
           />
-
+          <View style={styles.passwordInputContainer}>
+            <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.passwordToggle}>
+              <FontAwesome
+                name={passwordVisible ? 'eye' : 'eye-slash'}
+                size={20}
+                color={themeColors.text}
+              />
+            </TouchableOpacity>
+          </View>
           <CustomInput
-            placeholder="Password"
-            value={formData.password}
-            onChangeText={(text) => setFormData({ ...formData, password: text })}
-            secureTextEntry
-          />
+              placeholder="Password"
+              value={formData.password}
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              secureTextEntry={!passwordVisible}  // Toggle password visibility
+            />
+
 
           {!isLogin && (
             <>
-              <CustomInput
+              {/* <CustomInput
                 placeholder="Referral Code"
                 value={formData.referralCode}
                 onChangeText={(text) => setFormData({ ...formData, referralCode: text })}
-              />
+              /> */}
 
               <View style={styles.checkboxContainer}>
                 <Checkbox
@@ -116,11 +141,11 @@ export default function AuthScreen() {
           </View>
 
           <CustomButton
-              loading={loading}
-              title={isLogin ? 'Login' : 'Sign Up'}
-              onPress={handleAuth}
-              disabled={!isLogin && !agreedToTerms} // Disable for "Sign Up" until terms are agreed
-            />
+            loading={loading}
+            title={isLogin ? 'Login' : 'Sign Up'}
+            onPress={handleAuth}
+            disabled={!isLogin && !agreedToTerms} // Disable for "Sign Up" until terms are agreed
+          />
           <CustomButton
             title={isLogin ? 'Create a new account' : 'Already have an account? Login'}
             onPress={() => setIsLogin(!isLogin)}
@@ -186,5 +211,16 @@ const styles = StyleSheet.create({
   termsText: {
     marginLeft: 8,
     fontSize: 14,
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  passwordToggle: {
+    position: 'absolute',
+    right: 16,
+    padding: 8,
   },
 });

@@ -22,6 +22,7 @@ interface Service {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  image: string;
 }
 
 interface Payment {

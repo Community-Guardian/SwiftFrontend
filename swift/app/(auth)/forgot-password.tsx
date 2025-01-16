@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CustomButton } from '@/components/CustomButton';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
+import axios from 'axios';
+import { BASE_URL } from '@/handler/apiConfig';
 
 const ForgotPasswordScreen: React.FC = () => {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'error' | 'success' | ''>('');
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
@@ -15,30 +19,35 @@ const ForgotPasswordScreen: React.FC = () => {
   const handleResetPassword = async () => {
     // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
     if (!emailOrPhone) {
-      Alert.alert('Error', 'Please enter your email.');
+      setMessage('Please enter your email.');
+      setMessageType('error');
       return;
     }
-  
+
     if (!emailRegex.test(emailOrPhone)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
+      setMessage('Please enter a valid email address.');
+      setMessageType('error');
       return;
     }
-  
+
     setLoading(true);
+    setMessage('');
+    setMessageType('');
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert('Success', 'Password reset instructions sent to your email.');
-      router.replace('/(auth)');
+      const response = await axios.post(`${BASE_URL}/user/password/reset/`, {
+        email: emailOrPhone,
+      });
+      setMessage('Password reset instructions sent to your email.');
+      setMessageType('success');
     } catch (error) {
-      Alert.alert('Error', 'Failed to send password reset instructions. Please try again.');
+      setMessage('Failed to send password reset instructions. Please try again.');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
@@ -55,6 +64,11 @@ const ForgotPasswordScreen: React.FC = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      {message ? (
+        <Text style={[styles.message, messageType === 'error' ? styles.errorText : styles.successText]}>
+          {message}
+        </Text>
+      ) : null}
       <CustomButton
         title="Send Reset Instructions"
         onPress={handleResetPassword}
@@ -92,6 +106,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 1,
+  },
+  message: {
+    fontSize: 16,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+  },
+  successText: {
+    color: 'green',
   },
   backToLogin: {
     marginTop: 16,

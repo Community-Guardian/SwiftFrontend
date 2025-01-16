@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await login(email, password1);
     } catch (error) {
       console.error('Registration failed', error);
+      throw error;
     } finally {
       setLoading(false);
     }

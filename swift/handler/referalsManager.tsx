@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosResponse, AxiosRequestConfig,InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { GET_REFERRALS_URL, CREATE_REFERRAL_URL, GET_REWARDS_URL, CREATE_REWARD_URL, REFRESH_TOKEN_URL } from '@/handler/apiConfig';
@@ -47,18 +47,25 @@ const api = axios.create({
 
 // Add a request interceptor to include the access token in headers
 api.interceptors.request.use(
-  async (config: AxiosRequestConfig) => {
+  async (config: AxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     try {
-      const token = await AsyncStorage.getItem("accessToken");
+      const token = await localStorage.getItem('accessToken');
       if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+        };
+      } else {
+        config.headers = {}; // provide a default value for headers
       }
     } catch (error) {
-      console.error("Error retrieving access token:", error);
+      console.error('Error retrieving access token:', error);
     }
-    return config;
+    return config as InternalAxiosRequestConfig; // cast config to InternalAxiosRequestConfig
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => {
+    return Promise.reject(error);
+  }
 );
 
 // Handle refresh token logic

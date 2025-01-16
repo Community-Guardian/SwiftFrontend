@@ -18,12 +18,34 @@ import PayNowModal from '../../components/PayNowModal';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
-
+  interface ServiceType {
+    id: number;
+    name: string;
+    icon: string;
+    created_at: string;
+    updated_at: string;
+  }
+  
+  interface Service {
+    id: number;
+    name: string;
+    service_type: ServiceType; // Nested service type object
+    service_type_id: string; 
+    price: number;
+    description: string;
+    link: string;
+    duration: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    image: string;
+  }
+  
 export default function SubscribeScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { services, getServices } = useServices();
-  const [filteredServices, setFilteredServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState<Service | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
