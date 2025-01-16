@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Fetch the user object after login
       const userData = await AuthManager.getUser();
       setUser(userData);
-
       // Check if the user is verified and redirect accordingly
       if (!userData.is_verified) {
         router.push('/screens/verify-account');

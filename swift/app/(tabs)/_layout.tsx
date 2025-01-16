@@ -2,10 +2,7 @@ import { Tabs,useRouter } from 'expo-router';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity, Text } from 'react-native';
-import { ThemeProvider,useTheme } from '@/context/ThemeContext';
-import { ConnectivityProvider, useConnectivity } from '@/context/ConnectivityContext';
-import { PermissionsProvider } from '@/context/PermissionsContext ';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import {  useAuth } from '@/context/AuthContext';
 import { PaymentsProvider } from '@/context/PaymentsContext';
 import { ServicesProvider } from '@/context/ServicesContext';
 import { LogsProvider } from '@/context/LogsContext';
@@ -13,6 +10,8 @@ import { FeedbackProvider } from '@/context/FeedbackContext';
 import { ArticlesProvider } from '@/context/ArticlesContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
 import { ReferralsProvider } from '@/context/ReferralsContext';
+import { RedirectProvider } from '@/context/RedirectContext';
+import { useTheme } from '@/context/ThemeContext';
 function AppContent() {
   const { theme } = useTheme();
   const currentTheme = theme === 'dark' ? darkTheme : lightTheme;
@@ -20,7 +19,7 @@ function AppContent() {
   const router = useRouter()
   if (!isAuthenticated) {
     // If user is not authenticated, redirect to login or show a different screen
-    router.push('/(auth)/index')
+    router.push('/(auth)')
   }
   return (
     <Tabs
@@ -93,6 +92,7 @@ function AppContent() {
 }
 export default function TabLayout() {
   return (
+    <RedirectProvider>
       <PaymentsProvider>
         <ServicesProvider>
           <LogsProvider>
@@ -108,6 +108,7 @@ export default function TabLayout() {
           </LogsProvider>
         </ServicesProvider>
       </PaymentsProvider>
+    </RedirectProvider>
    );
 }
 

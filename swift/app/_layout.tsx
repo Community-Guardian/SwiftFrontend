@@ -6,6 +6,7 @@ import { PermissionsProvider } from '@/context/PermissionsContext ';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CreateTradingAccountProvider } from '@/context/CreateTradingAccountContext';
 
+import { LogoutProvider } from '@/context/LogoutContext';
 
 
 function AppContent() {
@@ -19,6 +20,15 @@ function AppContent() {
     return (
       <Stack>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+  if (isAuthenticated) {
+    // Render other-related screens
+    return (
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="screens" options={{ headerShown: false }} />      
       </Stack>
     );
   }
@@ -45,7 +55,9 @@ export default function RootLayoutNav() {
         <ConnectivityProvider>
           <ThemeProvider>
             <CreateTradingAccountProvider>
-              <AppContent />
+              <LogoutProvider>
+                <AppContent />
+              </LogoutProvider>
             </CreateTradingAccountProvider>
           </ThemeProvider>
         </ConnectivityProvider>

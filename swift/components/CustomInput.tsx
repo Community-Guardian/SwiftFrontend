@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, View, Text, StyleSheet } from 'react-native';
+import { TextInput, View, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 
@@ -26,6 +26,8 @@ export function CustomInput({ placeholder, value, onChangeText, secureTextEntry 
           {
             backgroundColor: theme === 'light' ? '#F5F5F5' : '#2A2A2A',
             color: themeColors.text,
+            borderColor: theme === 'light' ? '#CCCCCC' : '#555555',
+            shadowColor: theme === 'light' ? '#000' : '#FFFFFF',
           },
         ]}
         placeholderTextColor={theme === 'light' ? '#666666' : '#999999'}
@@ -43,6 +45,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 16,
+    borderWidth: 1, // Add border width for outline
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset
+    shadowOpacity: 0.1, // Shadow opacity
+    shadowRadius: 4, // Shadow blur radius
+    elevation: 2, // Elevation for Android shadow
   },
 });
-

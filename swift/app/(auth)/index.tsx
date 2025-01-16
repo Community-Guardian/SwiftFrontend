@@ -8,6 +8,7 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 import Checkbox from 'expo-checkbox';
 import { useAuth } from '../../context/AuthContext';
 import { useCreateTradingAccount } from '../../context/CreateTradingAccountContext';
+import { useLogout } from '../../context/LogoutContext';
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function AuthScreen() {
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { login, register, loading } = useAuth();
   const { hasSkipped, setHasSkipped } = useCreateTradingAccount();
+  const { setRememberMe } = useLogout();
 
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -23,7 +25,7 @@ export default function AuthScreen() {
     name: '',
     referralCode: '',
   });
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMeState] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,6 +33,7 @@ export default function AuthScreen() {
     try {
       if (isLogin) {
         await login(formData.email, formData.password);
+        setRememberMe(rememberMe);
       } else {
         await register(formData.email, formData.password, formData.password, 'customer');
         if (!hasSkipped) {
@@ -44,16 +47,16 @@ export default function AuthScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: themeColors.card, shadowColor: themeColors.shadow }]}>
         <Text style={[styles.title, { color: themeColors.text }]}>
-          {isLogin ? 'Login to your account.' : 'Sign Up'}
+          {isLogin ? 'Login to your account' : 'Sign Up'}
         </Text>
 
         <Text style={[styles.subtitle, { color: themeColors.text }]}>
           {isLogin ? 'Hello. Welcome back to your account' : 'Create a new account'}
         </Text>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {error ? <Text style={[styles.errorText, { color: themeColors.error }]}>{error}</Text> : null}
 
         <ScrollView contentContainerStyle={styles.form}>
           <CustomInput
@@ -81,7 +84,7 @@ export default function AuthScreen() {
                 <Checkbox
                   value={agreedToTerms}
                   onValueChange={setAgreedToTerms}
-                  color={agreedToTerms ? '#2196F3' : undefined}
+                  color={agreedToTerms ? themeColors.primary : undefined}
                 />
                 <Text style={[styles.termsText, { color: themeColors.text }]}>
                   I agree to Terms And Conditions
@@ -94,8 +97,11 @@ export default function AuthScreen() {
             <View style={styles.checkboxContainer}>
               <Checkbox
                 value={rememberMe}
-                onValueChange={setRememberMe}
-                color={rememberMe ? '#2196F3' : undefined}
+                onValueChange={(value) => {
+                  setRememberMeState(value);
+                  setRememberMe(value);
+                }}
+                color={rememberMe ? themeColors.primary : undefined}
               />
               <Text style={[styles.rememberText, { color: themeColors.text }]}>
                 Remember me
@@ -104,13 +110,17 @@ export default function AuthScreen() {
 
             {isLogin && (
               <TouchableOpacity onPress={() => router.push('/forgot-password')}>
-                <Text style={styles.forgotText}>Forgot Pass?</Text>
+                <Text style={[styles.forgotText, { color: themeColors.primary }]}>Forgot Password?</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          <CustomButton loading={loading} title={isLogin ? 'Login' : 'Sign Up'} onPress={handleAuth} />
-
+          <CustomButton
+              loading={loading}
+              title={isLogin ? 'Login' : 'Sign Up'}
+              onPress={handleAuth}
+              disabled={!isLogin && !agreedToTerms} // Disable for "Sign Up" until terms are agreed
+            />
           <CustomButton
             title={isLogin ? 'Create a new account' : 'Already have an account? Login'}
             onPress={() => setIsLogin(!isLogin)}
@@ -127,14 +137,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
   },
   card: {
-    width: '90%',
+    width: '100%',
     padding: 20,
     borderRadius: 10,
-    backgroundColor: '#fff',
     elevation: 5,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -151,7 +160,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   errorText: {
-    color: 'red',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -173,7 +181,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   forgotText: {
-    color: '#2196F3',
     fontSize: 14,
   },
   termsText: {

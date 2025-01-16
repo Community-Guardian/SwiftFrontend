@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Share, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Share } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
-import { Ionicons } from '@expo/vector-icons';
 import { useReferrals } from '../../context/ReferralsContext';
 import { useAuth } from '../../context/AuthContext';
+import { useRedirect } from '../../context/RedirectContext';
 
 export default function EarnScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { user } = useAuth();
   const { referrals, getReferrals, createReferral, loading } = useReferrals();
+  const { createReferralLink, handleRedirect } = useRedirect();
 
   useEffect(() => {
     getReferrals();
@@ -19,8 +20,9 @@ export default function EarnScreen() {
   const handleRefer = async () => {
     if (user && user.referral_code) {
       try {
+        const referralLink = createReferralLink(user.referral_code);
         const result = await Share.share({
-          message: `Join us and earn rewards! Use my referral code: ${user.referral_code}`,
+          message: `Join us and earn rewards! Use my referral link: ${referralLink}`,
         });
 
         if (result.action === Share.sharedAction) {
@@ -50,30 +52,11 @@ export default function EarnScreen() {
       </Text>
 
       <TouchableOpacity onPress={handleRefer} style={[styles.button, { backgroundColor: themeColors.primary }]}>
-        <Text style={styles.buttonText}>Share Referral Code</Text>
+        <Text style={styles.buttonText}>Share Referral Link</Text>
       </TouchableOpacity>
 
-      {/* Loading indicator */}
-      {/* {loading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />} */}
-
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
-      {referrals.length === 0 ? (
-        <Text style={[styles.noReferralsText, { color: themeColors.text }]}>
-          You have no referrals yet. Share your referral code to start earning rewards!
-        </Text>
-      ) : (
-        <FlatList
-          data={referrals}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={[styles.referralItem, { backgroundColor: themeColors.card }]}>
-              <Text style={[styles.referralText, { color: themeColors.text }]}>
-                {item.referrer} - Reward: {item.reward_amount}
-              </Text>
-            </View>
-          )}
-        />
-      )}
+      {/* Render referrals list */}
     </View>
   );
 }
@@ -109,21 +92,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  noReferralsText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 20,
-  },
-  referralItem: {
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  referralText: {
-    fontSize: 16,
-  },
-  loadingIndicator: {
-    marginVertical: 20,
   },
 });
