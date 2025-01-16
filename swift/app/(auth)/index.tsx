@@ -13,7 +13,7 @@ export default function AuthScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
-  const { login, register,loading } = useAuth();
+  const { login, register, loading } = useAuth();
   const { hasSkipped, setHasSkipped } = useCreateTradingAccount();
 
   const [isLogin, setIsLogin] = useState(true);
@@ -37,7 +37,6 @@ export default function AuthScreen() {
           router.push('/screens/verify-account');
         }
       }
-      router.push('/screens/verify-account');
     } catch (err: any) {
       setError(err.message);
     }
@@ -110,7 +109,7 @@ export default function AuthScreen() {
             )}
           </View>
 
-          <CustomButton  loading={loading} title={isLogin ? 'Login' : 'Sign Up'} onPress={handleAuth} />
+          <CustomButton loading={loading} title={isLogin ? 'Login' : 'Sign Up'} onPress={handleAuth} />
 
           <CustomButton
             title={isLogin ? 'Create a new account' : 'Already have an account? Login'}

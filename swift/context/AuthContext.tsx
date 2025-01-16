@@ -1,5 +1,3 @@
-"use client";
-
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AuthManager from '../handler/AuthManager';
 import { useRouter } from 'expo-router';
@@ -17,9 +15,9 @@ interface User {
   date_joined: string;
   last_login: string;
   image: string;
-  referral_code: string,
-  is_verified: boolean,
-  referred_by: string,
+  referral_code: string;
+  is_verified: boolean;
+  referred_by: string;
 }
 
 interface AuthContextProps {
@@ -47,10 +45,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
 
       // Fetch the user object after login
-      const userData = await AuthManager.getUser(); // Replace with the actual method to fetch user data
+      const userData = await AuthManager.getUser();
       setUser(userData);
 
-      router.push('/(tabs)');
+      // Check if the user is verified and redirect accordingly
+      if (!userData.is_verified) {
+        router.push('/screens/verify-account');
+      } else {
+        router.push('/create-trading-account');
+      }
     } catch (error) {
       console.error('Login failed', error);
       throw new Error('Login failed, try again');
@@ -78,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(true);
 
       // Fetch the user object if token is refreshed successfully
-      const userData = await AuthManager.getUser(); // Replace with the actual method to fetch user data
+      const userData = await AuthManager.getUser();
       setUser(userData);
     } catch (error) {
       console.error('Token refresh failed', error);
@@ -94,26 +97,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
     setUser(null);
     router.push('/');
-
   };
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('accessToken');
+    const checkAuth = async () => {
+      const token = await AsyncStorage.getItem('accessToken'); // Use AsyncStorage instead of localStorage
       if (token) {
         setIsAuthenticated(true);
 
         // Fetch the user object if a token exists
-        AuthManager.getUser()
-          .then((userData) => setUser(userData))
-          .catch((error) => {
-            console.error('Failed to fetch user', error);
-            setIsAuthenticated(false);
-          });
+        try {
+          const userData = await AuthManager.getUser();
+          setUser(userData);
+
+          // Check if the user is verified and redirect accordingly
+          if (!userData.is_verified) {
+            router.push('/screens/verify-account');
+          } else {
+            router.push('/create-trading-account');
+          }
+        } catch (error) {
+          console.error('Failed to fetch user', error);
+          setIsAuthenticated(false);
+        }
       }
     };
 
-    checkToken();
+    checkAuth();
   }, [router]);
 
   return (
