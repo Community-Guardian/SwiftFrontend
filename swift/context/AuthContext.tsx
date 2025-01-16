@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await AsyncStorage.getItem('accessToken'); // Use AsyncStorage instead of localStorage
+      const token = await AsyncStorage.getItem('accessToken'); 
       if (token) {
         setIsAuthenticated(true);
 

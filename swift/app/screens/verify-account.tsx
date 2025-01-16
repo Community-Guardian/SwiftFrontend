@@ -18,6 +18,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { router } from "expo-router";
 interface ServiceType {
   id: number;
   name: string;
@@ -67,7 +68,9 @@ export default function VerifyAccountScreen() {
       setIsPaymentModalVisible(true);
     }
   };
-
+  if (!service) {
+    router.push("/create-trading-account");
+  }
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
@@ -102,7 +105,7 @@ export default function VerifyAccountScreen() {
           <Text style={[styles.feeText, { color: themeColors.text }]}>
             Verification fee:{" "}
             <Text style={[styles.feeAmount, { color: themeColors.primary }]}>
-              50 KSh
+              {service?.price} KSh
             </Text>
           </Text>
         </CardContent>
@@ -116,6 +119,7 @@ export default function VerifyAccountScreen() {
                 { backgroundColor: themeColors.primary },
               ]}
               onPress={handleVerification}
+              
               disabled={!service} // Disable button if no service is available
             >
               <Text style={styles.verifyButtonText}>Verify Now</Text>
@@ -126,7 +130,7 @@ export default function VerifyAccountScreen() {
 
       {service && (
         <PayModal
-          isVisible={setIsPaymentModalVisible}
+          isVisible={isPaymentModalVisible}
           onClose={() => setIsPaymentModalVisible(false)}
           service={service}
         />

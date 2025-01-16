@@ -43,7 +43,7 @@ interface ApiErrorResponse {
 api.interceptors.request.use(
   async (config: AxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     try {
-      const token = await localStorage.getItem('accessToken');
+      const token = await AsyncStorage.getItem('accessToken');
       if (token && config.headers) {
         config.headers = {
           ...config.headers,
