@@ -1,10 +1,8 @@
-import axios, { AxiosError, AxiosResponse, AxiosRequestConfig,InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosResponse, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GET_REFERRALS_URL, CREATE_REFERRAL_URL, GET_REWARDS_URL, CREATE_REWARD_URL, GET_WITHDRAWAL_REQUESTS_URL, CREATE_WITHDRAWAL_REQUEST_URL, REFRESH_TOKEN_URL } from '@/handler/apiConfig';
 
-import { GET_REFERRALS_URL, CREATE_REFERRAL_URL, GET_REWARDS_URL, CREATE_REWARD_URL, REFRESH_TOKEN_URL } from '@/handler/apiConfig';
-
-
-// Define the response data structure for referrals and rewards
+// Define the response data structure for referrals, rewards, and withdrawal requests
 interface Referral {
   id: number;
   referrer: string;
@@ -21,6 +19,15 @@ interface Reward {
   referral: Referral;
   reward_amount: string;
   created_at: string;
+}
+
+interface WithdrawalRequest {
+  id: number;
+  user: string;
+  amount: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Define the error response structure
@@ -149,6 +156,27 @@ class ReferralsManager {
   async createReward(rewardData: Partial<Reward>): Promise<Reward | undefined> {
     try {
       const response = await api.post<Reward>(CREATE_REWARD_URL, rewardData);
+      return response.data;
+    } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>);
+      return undefined;
+    }
+  }
+
+  // Withdrawal Requests Methods
+  async getWithdrawalRequests(): Promise<WithdrawalRequest[]> {
+    try {
+      const response = await api.get<WithdrawalRequest[]>(GET_WITHDRAWAL_REQUESTS_URL);
+      return response.data;
+    } catch (error) {
+      handleApiError(error as AxiosError<ApiErrorResponse>);
+      return [];
+    }
+  }
+
+  async createWithdrawalRequest(withdrawalRequestData: Partial<WithdrawalRequest>): Promise<WithdrawalRequest | undefined> {
+    try {
+      const response = await api.post<WithdrawalRequest>(CREATE_WITHDRAWAL_REQUEST_URL, withdrawalRequestData);
       return response.data;
     } catch (error) {
       handleApiError(error as AxiosError<ApiErrorResponse>);

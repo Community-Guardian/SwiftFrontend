@@ -10,7 +10,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useCreateTradingAccount } from '../../context/CreateTradingAccountContext';
 import { useLogout } from '../../context/LogoutContext';
 import { FontAwesome } from '@expo/vector-icons';  // Import an icon library for toggle
-
 export default function AuthScreen() {
   const router = useRouter();
   const { theme } = useTheme();

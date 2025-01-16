@@ -19,14 +19,26 @@ interface Reward {
   created_at: string;
 }
 
+interface WithdrawalRequest {
+  id: number;
+  user: string;
+  amount: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ReferralsContextProps {
   referrals: Referral[];
   rewards: Reward[];
+  withdrawalRequests: WithdrawalRequest[];
   loading: boolean;
   getReferrals: () => Promise<void>;
   createReferral: (referralData: Partial<Referral>) => Promise<void>;
   getRewards: () => Promise<void>;
   createReward: (rewardData: Partial<Reward>) => Promise<void>;
+  getWithdrawalRequests: () => Promise<void>;
+  createWithdrawalRequest: (withdrawalRequestData: Partial<WithdrawalRequest>) => Promise<void>;
 }
 
 const ReferralsContext = createContext<ReferralsContextProps | undefined>(undefined);
@@ -34,6 +46,7 @@ const ReferralsContext = createContext<ReferralsContextProps | undefined>(undefi
 export const ReferralsProvider = ({ children }: { children: ReactNode }) => {
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [rewards, setRewards] = useState<Reward[]>([]);
+  const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
   const [loading, setLoading] = useState(false);
 
   const getReferrals = async () => {
@@ -88,13 +101,40 @@ export const ReferralsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const getWithdrawalRequests = async () => {
+    setLoading(true);
+    try {
+      const data = await referralsManager.getWithdrawalRequests();
+      setWithdrawalRequests(data);
+    } catch (error) {
+      console.error('Failed to fetch withdrawal requests', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createWithdrawalRequest = async (withdrawalRequestData: Partial<WithdrawalRequest>) => {
+    setLoading(true);
+    try {
+      const newWithdrawalRequest = await referralsManager.createWithdrawalRequest(withdrawalRequestData);
+      if (newWithdrawalRequest) {
+        setWithdrawalRequests([...withdrawalRequests, newWithdrawalRequest]);
+      }
+    } catch (error) {
+      console.error('Failed to create withdrawal request', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getReferrals();
     getRewards();
+    getWithdrawalRequests();
   }, []);
 
   return (
-    <ReferralsContext.Provider value={{ referrals, rewards, loading, getReferrals, createReferral, getRewards, createReward }}>
+    <ReferralsContext.Provider value={{ referrals, rewards, withdrawalRequests, loading, getReferrals, createReferral, getRewards, createReward, getWithdrawalRequests, createWithdrawalRequest }}>
       {children}
     </ReferralsContext.Provider>
   );
