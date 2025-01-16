@@ -18,6 +18,15 @@ export const Sidebar = ({ closeSidebar }) => {
     { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
     { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
     { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
+    {
+      icon: 'log-out',
+      title: 'Log Out',
+      action: () => {
+        logout(); // Call the logout function
+        closeSidebar(); // Close the sidebar after logout
+        router.push('/login'); // Redirect to the login page
+      },
+    },
     { icon: 'person', title: 'Update Profile', action: () => router.push('/screens/UpdateUserProfile') },
     { icon: 'log-out', title: 'Log Out', action: () => router.push('/(auth)') },
   ];
@@ -113,4 +122,3 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 });
-
