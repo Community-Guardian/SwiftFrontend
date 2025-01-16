@@ -51,12 +51,11 @@ export default function SettingsScreen() {
   ];
 
   useEffect(() => {
-    // Simulate a loading delay (e.g., fetching from a server or local storage)
     const timer = setTimeout(() => {
-      setLoading(false); // Simulate finished loading after 2 seconds
+      setLoading(false);
     }, 2000);
 
-    return () => clearTimeout(timer); // Cleanup on unmount
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
@@ -68,9 +67,9 @@ export default function SettingsScreen() {
   }
 
   return (
-    <ScrollView 
+    <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={styles.contentContainer} // Apply alignment here
     >
       <Text style={[styles.title, { color: themeColors.text }]}>Settings</Text>
 
@@ -79,7 +78,7 @@ export default function SettingsScreen() {
           <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
             {section.title}
           </Text>
-          
+
           {section.settings.map((setting, settingIndex) => (
             <View 
               key={settingIndex}
@@ -114,10 +113,9 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  content: {
+  contentContainer: {
+    justifyContent: 'flex-start', // Moved alignment properties here
     padding: 16,
   },
   title: {
