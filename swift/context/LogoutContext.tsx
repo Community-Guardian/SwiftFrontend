@@ -15,7 +15,7 @@ export const LogoutProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'background' && !rememberMe) {
-        logout();
+        // logout();
       }
     };
 

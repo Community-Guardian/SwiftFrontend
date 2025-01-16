@@ -5,6 +5,7 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useServices } from '../../context/ServicesContext';
 import PayNowModal from '../../components/PayNowModal';
+import ServiceDetailsModal from '../../components/ServiceDetailsModal';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
@@ -40,6 +41,7 @@ export default function EnrollScreen() {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isServiceDetailsModalVisible, setServiceDetailsModalVisible] = useState(false);
 
   useEffect(() => {
     getServices();
@@ -66,6 +68,10 @@ export default function EnrollScreen() {
       service.service_type.name === 'Trading Classes'
     );
     setFilteredServices(filtered);
+  };
+  const handleServiceClick = (service: Service) => {
+    setSelectedService(service);
+    setServiceDetailsModalVisible(true);
   };
 
   const handlePayNow = (service: Service) => {
@@ -95,28 +101,30 @@ export default function EnrollScreen() {
           data={filteredServices}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
-              <Image source={{ uri: item?.image || DEFAULT_IMAGE }} style={styles.courseImage} />
-              <View style={styles.courseInfo}>
-                <Text style={[styles.courseTitle, { color: themeColors.text }]}>
-                  {item.name}
-                </Text>
-                <View style={styles.ratingContainer}>
-                  {renderStars(item.rating || 5)}
-                </View>
-                <View style={styles.courseDetails}>
-                  <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
-                    {item.duration} days
+            <TouchableOpacity onPress={() => handleServiceClick(item)}>
+              <View style={[styles.courseCard, { backgroundColor: themeColors.card }]}>
+                <Image source={{ uri: item?.image || DEFAULT_IMAGE }} style={styles.courseImage} />
+                <View style={styles.courseInfo}>
+                  <Text style={[styles.courseTitle, { color: themeColors.text }]}>
+                    {item.name}
                   </Text>
-                  <Text style={[styles.price, { color: themeColors.text }]}>
-                    {item.price}
-                  </Text>
+                  <View style={styles.ratingContainer}>
+                    {renderStars(item.rating || 5)}
+                  </View>
+                  <View style={styles.courseDetails}>
+                    <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
+                      {item.duration} days
+                    </Text>
+                    <Text style={[styles.price, { color: themeColors.text }]}>
+                      {item.price}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.payNowButton}>
+                    <Text style={styles.payNowButtonText}>Pay Now</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.payNowButton}>
-                  <Text style={styles.payNowButtonText}>Pay Now</Text>
-                </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -126,6 +134,13 @@ export default function EnrollScreen() {
         <PayNowModal
           isVisible={isModalVisible}
           onClose={() => setModalVisible(false)}
+          service={selectedService}
+        />
+      )}
+       {selectedService && (
+        <ServiceDetailsModal
+          isVisible={isServiceDetailsModalVisible}
+          onClose={() => setServiceDetailsModalVisible(false)}
           service={selectedService}
         />
       )}

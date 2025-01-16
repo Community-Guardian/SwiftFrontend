@@ -70,8 +70,8 @@ function AppContent() {
         options={{ title: 'Verify Account', headerLeft: () => <AuthButton /> }}
       />
       <Stack.Screen
-        name="User Profile"
-        options={{ title: 'Update User Profile', headerLeft: () => <BackButton /> }}
+        name="UpdateUserProfile"
+        options={{ title: 'User Profile', headerLeft: () => <BackButton /> }}
       />
     </Stack>
   );

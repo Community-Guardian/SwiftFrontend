@@ -29,7 +29,7 @@ export const LOGIN_URL = `${BASE_URL}/login/`;
 /**
  * Logout a user.
  */
-export const LOGOUT_URL = `${BASE_URL}/auth/logout/`;
+export const LOGOUT_URL = `${BASE_URL}/logout/`;
 // Service endpoints
 /**
  * Get all services or a specific service by ID.

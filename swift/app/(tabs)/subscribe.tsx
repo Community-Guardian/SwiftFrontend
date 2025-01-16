@@ -15,6 +15,7 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useServices } from '../../context/ServicesContext';
 import PayNowModal from '../../components/PayNowModal';
+import ServiceDetailsModal from '../../components/ServiceDetailsModal';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
@@ -50,6 +51,7 @@ export default function SubscribeScreen() {
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [isServiceDetailsModalVisible, setServiceDetailsModalVisible] = useState(false);
 
   useEffect(() => {
     getServices();
@@ -72,7 +74,10 @@ export default function SubscribeScreen() {
     );
     setFilteredServices(filtered);
   };
-
+  const handleServiceClick = (service: Service) => {
+    setSelectedService(service);
+    setServiceDetailsModalVisible(true);
+  };
   const handlePayNow = (service) => {
     setSelectedService(service);
     setModalVisible(true);
@@ -103,24 +108,26 @@ export default function SubscribeScreen() {
           data={filteredServices}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={[styles.signalCard, { backgroundColor: themeColors.card }]}>
-              <Image
-                source={{ uri: item.image || DEFAULT_IMAGE }}
-                style={styles.signalImage}
-                resizeMode="cover"
-              />
-              <View style={styles.signalInfo}>
-                <View>
-                  <Text style={[styles.signalName, { color: themeColors.text }]}>{item.name}</Text>
-                  <Text style={[styles.price, { color: themeColors.primary }]}>
-                    Price: Ksh {item.price}
-                  </Text>
+            <TouchableOpacity onPress={() => handleServiceClick(item)}>
+              <View style={[styles.signalCard, { backgroundColor: themeColors.card }]}>
+                <Image
+                  source={{ uri: item.image || DEFAULT_IMAGE }}
+                  style={styles.signalImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.signalInfo}>
+                  <View>
+                    <Text style={[styles.signalName, { color: themeColors.text }]}>{item.name}</Text>
+                    <Text style={[styles.price, { color: themeColors.primary }]}>
+                      Price: Ksh {item.price}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.subscribeButton}>
+                    <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => handlePayNow(item)} style={styles.subscribeButton}>
-                  <Text style={styles.subscribeButtonText}>Subscribe Now</Text>
-                </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -129,6 +136,14 @@ export default function SubscribeScreen() {
         <PayNowModal
           isVisible={isModalVisible}
           onClose={() => setModalVisible(false)}
+          service={selectedService}
+        />
+      )}
+
+      {selectedService && (
+        <ServiceDetailsModal
+          isVisible={isServiceDetailsModalVisible}
+          onClose={() => setServiceDetailsModalVisible(false)}
           service={selectedService}
         />
       )}

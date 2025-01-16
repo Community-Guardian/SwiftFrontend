@@ -5,41 +5,44 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useServices } from '../../context/ServicesContext';
 import PayNowModal from '../../components/PayNowModal';
+import ServiceDetailsModal from '../../components/ServiceDetailsModal';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
-  interface ServiceType {
-    id: number;
-    name: string;
-    icon: string;
-    created_at: string;
-    updated_at: string;
-  }
-  
-  interface Service {
-    id: number;
-    name: string;
-    service_type: ServiceType; // Nested service type object
-    service_type_id: string; 
-    price: number;
-    description: string;
-    link: string;
-    duration: string;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    image: string;
-  }
-  
+
+interface ServiceType {
+  id: number;
+  name: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  service_type: ServiceType;
+  service_type_id: string;
+  price: number;
+  description: string;
+  link: string;
+  duration: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  image: string;
+}
+
 export default function InvestScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { services, getServices } = useServices();
-  const [filteredServices, setFilteredServices] = useState<Service | null>(null);
+  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isServiceDetailsModalVisible, setServiceDetailsModalVisible] = useState(false);
 
   useEffect(() => {
     getServices();
@@ -62,13 +65,14 @@ export default function InvestScreen() {
     setFilteredServices(filtered);
   };
 
-  const handlePayNow = (service) => {
+  const handleServiceClick = (service: Service) => {
     setSelectedService(service);
-    setModalVisible(true);
+    setServiceDetailsModalVisible(true);
   };
 
-  const handleView = (link: string) => {
-    Linking.openURL(link);
+  const handlePayNow = (service: Service) => {
+    setSelectedService(service);
+    setModalVisible(true);
   };
 
   return (
@@ -84,10 +88,6 @@ export default function InvestScreen() {
         />
       </View>
 
-      <Text style={[styles.interestText, { color: themeColors.text }]}>
-        With Interest of 5% Per Week
-      </Text>
-
       {/* Loading Indicator */}
       {isLoading ? (
         <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />
@@ -96,28 +96,30 @@ export default function InvestScreen() {
           data={filteredServices}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View style={[styles.investmentCard, { backgroundColor: themeColors.card }]}>
-              <Text style={[styles.serviceName, { color: themeColors.text }]}>
-                {item.name}
-              </Text>
-              <Text style={[styles.description, { color: themeColors.text }]}>
-                {item.description || "No description available for this plan."}
-              </Text>
-              <View style={styles.investmentInfo}>
-                <View style={[styles.amountContainer, { backgroundColor: themeColors.primary }]}>
-                  <Text style={styles.amount}>KSH {item.price}</Text>
+            <TouchableOpacity onPress={() => handleServiceClick(item)}>
+              <View style={[styles.investmentCard, { backgroundColor: themeColors.card }]}>
+                <Text style={[styles.serviceName, { color: themeColors.text }]}>
+                  {item.name}
+                </Text>
+                <Text style={[styles.description, { color: themeColors.text }]}>
+                  {item.description || "No description available for this plan."}
+                </Text>
+                <View style={styles.investmentInfo}>
+                  <View style={[styles.amountContainer, { backgroundColor: themeColors.primary }]}>
+                    <Text style={styles.amount}>KSH {item.price}</Text>
+                  </View>
+                  <View style={[styles.durationContainer, { backgroundColor: themeColors.secondary }]}>
+                    <Text style={styles.duration}>{item.duration} Days</Text>
+                  </View>
                 </View>
-                <View style={[styles.durationContainer, { backgroundColor: themeColors.secondary }]}>
-                  <Text style={styles.duration}>{item.duration} Days</Text>
-                </View>
+                <TouchableOpacity
+                  onPress={() => handlePayNow(item)}
+                  style={[styles.investButton, { backgroundColor: themeColors.primary }]}
+                >
+                  <Text style={styles.investButtonText}>Invest With Us</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                onPress={() => handlePayNow(item)}
-                style={[styles.investButton, { backgroundColor: themeColors.primary }]}
-              >
-                <Text style={styles.investButtonText}>Invest With Us</Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -126,6 +128,14 @@ export default function InvestScreen() {
         <PayNowModal
           isVisible={isModalVisible}
           onClose={() => setModalVisible(false)}
+          service={selectedService}
+        />
+      )}
+
+      {selectedService && (
+        <ServiceDetailsModal
+          isVisible={isServiceDetailsModalVisible}
+          onClose={() => setServiceDetailsModalVisible(false)}
           service={selectedService}
         />
       )}
@@ -149,11 +159,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
   },
-  interestText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 16,
-  },
   investmentCard: {
     margin: 16,
     padding: 16,
@@ -163,6 +168,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+  },
+  description: {
+    fontSize: 14,
+    marginVertical: 8,
+    lineHeight: 20,
   },
   investmentInfo: {
     flexDirection: 'row',

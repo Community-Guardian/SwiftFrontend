@@ -20,10 +20,31 @@ export default function UpdateUserProfileScreen() {
   const handleUpdate = async () => {
     try {
       if (user) {
-        await updateUser(user.id, { username, email, first_name: firstName, last_name: lastName, referral_code: referralCode, image });
+        // Create a FormData object for submitting data
+        const formPayload = new FormData();
+  
+        // Append form fields
+        formPayload.append('username', username);
+        formPayload.append('email', email);
+        formPayload.append('first_name', firstName);
+        formPayload.append('last_name', lastName);
+        formPayload.append('referral_code', referralCode);
+  
+        // Append image file if it exists
+        if (image) {
+          const uriParts = image.split('.');
+          const fileType = uriParts[uriParts.length - 1];
+          const response = await fetch(image);
+          const blob = await response.blob();
+          formPayload.append('image', blob, `photo.${fileType}`);
+        }
+  
+        // Call the API to update the profile
+        await updateUser(user.id, formPayload);
         setMessage({ text: 'Profile updated successfully!', type: 'success' });
       }
     } catch (error) {
+      console.error('Error updating profile:', error);
       setMessage({ text: 'Failed to update profile.', type: 'error' });
     }
   };

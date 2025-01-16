@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Modal, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Modal,
+  ActivityIndicator,
+  ScrollView,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sidebar } from '../../components/Sidebar';
@@ -18,7 +26,6 @@ export default function HomeScreen() {
   const [totalRewards, setTotalRewards] = useState(0);
 
   useEffect(() => {
-    // Simulate an initialization process
     const timeout = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timeout);
   }, []);
@@ -69,62 +76,75 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Grid */}
-      <View style={styles.grid}>
-        {[{
-          title: 'Enroll for Courses',
-          route: '/enroll',
-          colors: ['#6A11CB', '#2575FC'],
-        },
-        {
-          title: 'Buy Signals',
-          route: '/subscribe',
-          colors: ['#FF6F61', '#D91E18'],
-        },
-        {
-          title: 'Invest With Us',
-          route: '/invest',
-          colors: ['#4CAF50', '#087F23'],
-        },
-        {
-          title: 'Earn With Us',
-          route: '/earn',
-          colors: ['#FDC830', '#F37335'],
-        }].map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => router.push(item.route)}
-            style={styles.cardWrapper}
-          >
-            <LinearGradient
-              colors={item.colors}
-              style={styles.card}
-              start={[0, 0]}
-              end={[1, 1]}
+      {/* Content */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Grid */}
+        <View style={styles.grid}>
+          {[
+            {
+              title: 'Enroll for Courses',
+              route: '/enroll',
+              colors: ['#6A11CB', '#2575FC'],
+            },
+            {
+              title: 'Buy Signals',
+              route: '/subscribe',
+              colors: ['#FF6F61', '#D91E18'],
+            },
+            {
+              title: 'Invest With Us',
+              route: '/invest',
+              colors: ['#4CAF50', '#087F23'],
+            },
+            {
+              title: 'Earn With Us',
+              route: '/earn',
+              colors: ['#FDC830', '#F37335'],
+            },
+          ].map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => router.push(item.route)}
+              style={styles.cardWrapper}
             >
-              <Text style={[styles.cardText, { color: themeColors.cardText }]}>
-                {item.title}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        ))}
-      </View>
+              <LinearGradient
+                colors={item.colors}
+                style={styles.card}
+                start={[0, 0]}
+                end={[1, 1]}
+              >
+                <Text style={[styles.cardText, { color: themeColors.cardText }]}>{item.title}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Total Rewards Card */}
-      <View style={styles.rewardsCardContainer}>
-        <LinearGradient
-          colors={['#34E89E', '#0F3443']}
-          style={styles.rewardsCard}
-        >
-          <Text style={styles.rewardTitle}>Total Rewards</Text>
-          <Text style={styles.rewardAmount}>Ksh {totalRewards.toFixed(2)}</Text>
-          <Text style={styles.rewardNote}>
-            {totalRewards > 0
-              ? 'Money sent to your account'
-              : 'No rewards yet. Start referring!'}
-          </Text>
-        </LinearGradient>
-      </View>
+        {/* Total Rewards Card */}
+        <View style={styles.rewardsCardContainer}>
+          <LinearGradient colors={['#34E89E', '#0F3443']} style={styles.rewardsCard}>
+            <Text style={styles.rewardTitle}>Total Rewards</Text>
+            <Text style={styles.rewardAmount}>Ksh {totalRewards.toFixed(2)}</Text>
+            <TouchableOpacity onPress={() => router.push('/earn')}>
+              <Text style={styles.rewardNote}>
+                {totalRewards > 0
+                  ? 'Money sent to your account'
+                  : 'No rewards yet. Start referring!'}
+              </Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+
+        {/* Track Investments Card */}
+        <View style={styles.rewardsCardContainer}>
+          <LinearGradient colors={['#8E2DE2', '#4A00E0']} style={styles.rewardsCard}>
+            <Text style={styles.rewardTitle}>Track Investments</Text>
+            <Text style={styles.rewardNote}>Monitor your ongoing investments here.</Text>
+            <TouchableOpacity onPress={() => router.push('/track')}>
+              <Text style={styles.rewardNote}>View Details</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -132,7 +152,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
   center: {
     justifyContent: 'center',
@@ -142,7 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    padding: 16,
   },
   hamburger: {
     padding: 8,
@@ -150,13 +169,17 @@ const styles = StyleSheet.create({
   themeToggle: {
     padding: 8,
   },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
   cardWrapper: {
-    width: '48%',
+    width: '45%',
     marginBottom: 16,
     borderRadius: 16,
     overflow: 'hidden',
@@ -169,13 +192,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   cardText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   rewardsCardContainer: {
     marginTop: 16,
-    alignItems: 'center',
   },
   rewardsCard: {
     width: '100%',
@@ -202,6 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     color: '#FFF',
+    textDecorationLine: 'underline',
   },
   loadingText: {
     marginTop: 16,

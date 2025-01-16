@@ -175,16 +175,22 @@ class AuthManager {
       throw error      
     }
   }
-    async updateUser(id: string, userData: Partial<User>) {
-      try {
-        const response = await api.patch(`/users/${id}/`, userData)
-        return response.data
-      } catch (error) {
-        handleApiError(error as AxiosError<ApiErrorResponse>); 
-        console.error('Failed to update user', error)
-        throw error
-      }
+  async updateUser(id: string, data: FormData) {
+    try {
+      // Make a PATCH request to update the user, passing FormData as the body
+      const response = await api.patch(`/users/${id}/`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Important for sending FormData
+        },
+      });
+      return response.data; // Return the response data
+    } catch (error) {
+      // Handle any API errors
+      handleApiError(error as AxiosError<ApiErrorResponse>);
+      console.error('Failed to update user', error);
+      throw error; // Throw error to be handled further if needed
     }
+  }
   
 }
 const authManager = new AuthManager();
