@@ -69,7 +69,7 @@ export default function VerifyAccountScreen() {
     }
   };
 
-  if (loading) {
+  if (loading || !service) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: themeColors.background }]}>
         <ActivityIndicator size="large" color={themeColors.primary} />
@@ -77,10 +77,7 @@ export default function VerifyAccountScreen() {
     );
   }
 
-  if (!service) {
-    router.push("/create-trading-account");
-    return null; // Prevent further rendering after navigation
-  }
+
 
   return (
     <ScrollView
