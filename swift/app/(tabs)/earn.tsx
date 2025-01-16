@@ -54,7 +54,7 @@ export default function EarnScreen() {
       </TouchableOpacity>
 
       {/* Loading indicator */}
-      {loading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />}
+      {/* {loading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />} */}
 
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
       {referrals.length === 0 ? (

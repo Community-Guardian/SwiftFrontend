@@ -4,11 +4,13 @@ import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 export const Sidebar = ({ closeSidebar }) => {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const router = useRouter();
+  const { logout } = useAuth(); // Destructure logout from useAuth
 
   const menuItems = [
     { icon: 'home', title: 'Home', action: () => router.push('/') },
@@ -17,7 +19,15 @@ export const Sidebar = ({ closeSidebar }) => {
     { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
     { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
     { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
-    { icon: 'log-out', title: 'Log Out', action: () => router.push('/login') },
+    {
+      icon: 'log-out',
+      title: 'Log Out',
+      action: () => {
+        logout(); // Call the logout function
+        closeSidebar(); // Close the sidebar after logout
+        router.push('/login'); // Redirect to the login page
+      },
+    },
   ];
 
   return (
@@ -111,4 +121,3 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 });
-
