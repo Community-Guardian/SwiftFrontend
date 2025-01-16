@@ -16,8 +16,11 @@ export const Sidebar = ({ closeSidebar }) => {
     { icon: 'people', title: 'About Us', action: () => router.push('/about') },
     { icon: 'document-text', title: 'Privacy Policy', action: () => router.push('/privacy-policy') },
     { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
-    { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
     { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
+
+    { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
+    
+    { icon: 'person', title: 'Profile', action: () => router.push('/screens/UpdateUserProfile') },
     {
       icon: 'log-out',
       title: 'Log Out',
@@ -27,8 +30,6 @@ export const Sidebar = ({ closeSidebar }) => {
         router.push('/login'); // Redirect to the login page
       },
     },
-    { icon: 'person', title: 'Update Profile', action: () => router.push('/screens/UpdateUserProfile') },
-    { icon: 'log-out', title: 'Log Out', action: () => router.push('/(auth)') },
   ];
 
   return (

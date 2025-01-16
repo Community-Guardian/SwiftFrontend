@@ -51,7 +51,7 @@ export default function PrivacyPolicyScreen() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={styles.contentContainer} // Fixed contentContainerStyle
     >
       <Text style={[styles.title, { color: themeColors.text }]}>Privacy Policy</Text>
 
@@ -87,10 +87,10 @@ export default function PrivacyPolicyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  content: {
+  contentContainer: {
+    alignItems: 'center', // Moved alignItems to contentContainerStyle
+    justifyContent: 'flex-start', // Adjust as needed
     padding: 16,
   },
   title: {
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
+    width: '100%',
   },
   sectionTitle: {
     fontSize: 20,
@@ -116,12 +117,14 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     lineHeight: 24,
+    textAlign: 'left',
   },
   contact: {
     marginTop: 24,
     paddingTop: 24,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
+    width: '100%',
   },
   contactTitle: {
     fontSize: 20,
