@@ -22,7 +22,7 @@ function AppContent() {
       }}
     >
       <Stack.Screen
-        name="offlineScreen" // Matches with the login.tsx screen
+        name="OfflineScreen" // Matches with the login.tsx screen
         options={{ title: 'Offline' }}
       />
       <Stack.Screen
@@ -33,7 +33,11 @@ function AppContent() {
       <Stack.Screen
         name="verify-account" // Matches with the verify-account.tsx screen
         options={{ title: 'Verify Account' }}
-      />   
+      />  
+      <Stack.Screen
+        name="UpdateUserProfile" // Matches with the verify-account.tsx screen
+        options={{ title: 'Update User Profile' }}
+      />  
     </Stack>
   );
 }

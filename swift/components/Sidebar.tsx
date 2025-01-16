@@ -4,12 +4,13 @@ import { useTheme } from '../context/ThemeContext';
 import { lightTheme, darkTheme } from '../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/AuthContext';
 
 export const Sidebar = ({ closeSidebar }) => {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const router = useRouter();
-
+  const { logout,user } = useAuth();
   const menuItems = [
     { icon: 'home', title: 'Home', action: () => router.push('/') },
     { icon: 'people', title: 'About Us', action: () => router.push('/about') },
@@ -17,7 +18,8 @@ export const Sidebar = ({ closeSidebar }) => {
     { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
     { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },
     { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
-    { icon: 'log-out', title: 'Log Out', action: () => router.push('/login') },
+    { icon: 'person', title: 'Update Profile', action: () => router.push('/screens/UpdateUserProfile') },
+    { icon: 'log-out', title: 'Log Out', action: () => router.push('/(auth)') },
   ];
 
   return (
@@ -28,11 +30,11 @@ export const Sidebar = ({ closeSidebar }) => {
       <View style={styles.profileSection}>
         <Image
           source={{
-            uri: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Dashboard-B1wa8xqYxa63FLrebRj7v68NUI2Iyb.png',
+            uri: user?.image,
           }}
           style={styles.avatar}
         />
-        <Text style={[styles.name, { color: themeColors.text }]}>LUKE SHAW</Text>
+        <Text style={[styles.name, { color: themeColors.text }]}>{user?.username.toUpperCase()}</Text>
       </View>
 
       <View style={styles.menuContainer}>

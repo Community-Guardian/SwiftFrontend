@@ -2,6 +2,22 @@ import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { LOGIN_URL, SIGN_UP_URL, REFRESH_TOKEN_URL,BASE_URL, LOGOUT_URL } from '@/handler/apiConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  user_type: string;
+  is_staff: boolean;
+  is_superuser: boolean;
+  date_joined: string;
+  last_login: string;
+  image: string;
+  referral_code: string;
+  is_verified: boolean;
+  referred_by: string;
+}
 // Define the response data structure for authentication
 interface AuthResponse {
   access: string;
@@ -154,6 +170,17 @@ class AuthManager {
       throw error      
     }
   }
+    async updateUser(id: string, userData: Partial<User>) {
+      try {
+        const response = await api.put(`/users/${id}/`, userData)
+        return response.data
+      } catch (error) {
+        handleApiError(error as AxiosError<ApiErrorResponse>); 
+        console.error('Failed to update user', error)
+        throw error
+      }
+    }
+  
 }
 const authManager = new AuthManager();
 export default authManager;

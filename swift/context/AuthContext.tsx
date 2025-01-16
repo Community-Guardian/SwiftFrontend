@@ -24,6 +24,7 @@ interface AuthContextProps {
   isAuthenticated: boolean;
   loading: boolean;
   user: User | null;
+  updateUser: (id: string, userData: Partial<User>) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password1: string, password2: string, user_type: string) => Promise<void>;
   refreshToken: () => Promise<void>;
@@ -98,7 +99,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     router.push('/');
   };
-
+  const updateUser = async (id: string, userData: Partial<User>) => {
+    setLoading(true);
+    try {
+      const updatedUser = await AuthManager.updateUser(id, userData);
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Failed to update user', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     const checkAuth = async () => {
       const token = await AsyncStorage.getItem('accessToken'); // Use AsyncStorage instead of localStorage
@@ -132,6 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         loading,
         user,
+        updateUser,
         login,
         register,
         refreshToken,
