@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Share, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,7 +54,7 @@ export default function EarnScreen() {
       </TouchableOpacity>
 
       {/* Loading indicator */}
-      {isLoading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />}
+      {loading && <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />}
 
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
       {referrals.length === 0 ? (
@@ -67,7 +67,9 @@ export default function EarnScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={[styles.referralItem, { backgroundColor: themeColors.card }]}>
-              <Text style={[styles.referralText, { color: themeColors.text }]}>{item.referrer}</Text>
+              <Text style={[styles.referralText, { color: themeColors.text }]}>
+                {item.referrer} - Reward: {item.reward_amount}
+              </Text>
             </View>
           )}
         />

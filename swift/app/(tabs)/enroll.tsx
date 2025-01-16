@@ -84,7 +84,7 @@ export default function EnrollScreen() {
                 </View>
                 <View style={styles.courseDetails}>
                   <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
-                    {item.duration}
+                    {item.duration} days
                   </Text>
                   <Text style={[styles.price, { color: themeColors.text }]}>
                     {item.price}

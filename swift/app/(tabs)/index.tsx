@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Card } from '../../components/Card';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Sidebar } from '../../components/Sidebar';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useReferrals } from '../../context/ReferralsContext';
 
 export default function HomeScreen() {
   const [isSidebarVisible, setSidebarVisible] = useState(false);
@@ -13,12 +14,23 @@ export default function HomeScreen() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
+  const { rewards, getRewards } = useReferrals();
+  const [totalRewards, setTotalRewards] = useState(0);
 
   useEffect(() => {
     // Simulate an initialization process
     const timeout = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    getRewards();
+  }, []);
+
+  useEffect(() => {
+    const total = rewards.reduce((sum, reward) => sum + parseFloat(reward.reward_amount || '0'), 0);
+    setTotalRewards(total);
+  }, [rewards]);
 
   const toggleSidebar = () => setSidebarVisible((prev) => !prev);
 
@@ -43,15 +55,11 @@ export default function HomeScreen() {
         <Sidebar closeSidebar={toggleSidebar} />
       </Modal>
 
+      {/* Header */}
       <View style={styles.header}>
-        {/* Hamburger Menu */}
         <TouchableOpacity onPress={toggleSidebar} style={styles.hamburger}>
-          <View style={[styles.line, { backgroundColor: themeColors.text }]} />
-          <View style={[styles.line, { backgroundColor: themeColors.text }]} />
-          <View style={[styles.line, { backgroundColor: themeColors.text }]} />
+          <Ionicons name="menu" size={28} color={themeColors.text} />
         </TouchableOpacity>
-
-        {/* Theme Toggle */}
         <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
           <Ionicons
             name={theme === 'light' ? 'moon' : 'sunny'}
@@ -61,20 +69,61 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Grid */}
       <View style={styles.grid}>
-        {[
-          { title: 'Enroll for Courses', route: '/enroll', color: themeColors.secondary },
-          { title: 'Buy Signals', route: '/subscribe', color: themeColors.primary },
-          { title: 'Invest With Us', route: '/invest', color: themeColors.primary },
-          { title: 'Earn With Us', route: '/earn', color: themeColors.secondary },
-        ].map((item, index) => (
-          <Card
+        {[{
+          title: 'Enroll for Courses',
+          route: '/enroll',
+          colors: ['#6A11CB', '#2575FC'],
+        },
+        {
+          title: 'Buy Signals',
+          route: '/subscribe',
+          colors: ['#FF6F61', '#D91E18'],
+        },
+        {
+          title: 'Invest With Us',
+          route: '/invest',
+          colors: ['#4CAF50', '#087F23'],
+        },
+        {
+          title: 'Earn With Us',
+          route: '/earn',
+          colors: ['#FDC830', '#F37335'],
+        }].map((item, index) => (
+          <TouchableOpacity
             key={index}
-            title={item.title}
             onPress={() => router.push(item.route)}
-            style={StyleSheet.flatten([styles.card, { backgroundColor: item.color }])}
-          />
+            style={styles.cardWrapper}
+          >
+            <LinearGradient
+              colors={item.colors}
+              style={styles.card}
+              start={[0, 0]}
+              end={[1, 1]}
+            >
+              <Text style={[styles.cardText, { color: themeColors.cardText }]}>
+                {item.title}
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
         ))}
+      </View>
+
+      {/* Total Rewards Card */}
+      <View style={styles.rewardsCardContainer}>
+        <LinearGradient
+          colors={['#34E89E', '#0F3443']}
+          style={styles.rewardsCard}
+        >
+          <Text style={styles.rewardTitle}>Total Rewards</Text>
+          <Text style={styles.rewardAmount}>Ksh {totalRewards.toFixed(2)}</Text>
+          <Text style={styles.rewardNote}>
+            {totalRewards > 0
+              ? 'Money sent to your account'
+              : 'No rewards yet. Start referring!'}
+          </Text>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -83,8 +132,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 24,
+    padding: 16,
   },
   center: {
     justifyContent: 'center',
@@ -98,14 +146,6 @@ const styles = StyleSheet.create({
   },
   hamburger: {
     padding: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  line: {
-    width: 24,
-    height: 3,
-    marginVertical: 2,
-    borderRadius: 2,
   },
   themeToggle: {
     padding: 8,
@@ -115,18 +155,53 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  card: {
-    width: '40%',
+  cardWrapper: {
+    width: '48%',
     marginBottom: 16,
-    aspectRatio: 1,
     borderRadius: 16,
-    padding: 16,
+    overflow: 'hidden',
+    elevation: 5,
+  },
+  card: {
+    aspectRatio: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+  },
+  cardText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  rewardsCardContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  rewardsCard: {
+    width: '100%',
+    padding: 20,
+    borderRadius: 16,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+  },
+  rewardTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
+  rewardAmount: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginVertical: 8,
+  },
+  rewardNote: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#FFF',
   },
   loadingText: {
     marginTop: 16,

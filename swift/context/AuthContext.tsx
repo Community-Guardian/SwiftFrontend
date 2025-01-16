@@ -3,6 +3,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AuthManager from '../handler/AuthManager';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
   id: string;
@@ -97,18 +98,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      setIsAuthenticated(true);
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (token) {
+        setIsAuthenticated(true);
 
-      // Fetch the user object if a token exists
-      AuthManager.getUser()
-        .then((userData) => setUser(userData))
-        .catch((error) => {
-          console.error('Failed to fetch user', error);
-          setIsAuthenticated(false);
-        });
-    }
+        // Fetch the user object if a token exists
+        AuthManager.getUser()
+          .then((userData) => setUser(userData))
+          .catch((error) => {
+            console.error('Failed to fetch user', error);
+            setIsAuthenticated(false);
+          });
+      }
+    };
+
+    checkToken();
   }, [router]);
 
   return (
