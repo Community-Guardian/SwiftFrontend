@@ -1,5 +1,5 @@
 // const BASE_URL = 'https://swift8393.pythonanywhere.com';
-const BASE_URL = 'http://192.168.50.200:80';
+const BASE_URL = 'http://10.10.86.109:80';
 export { BASE_URL };
 // User endpoints
 /**
@@ -230,3 +230,5 @@ export const GET_REFERRALS_URL = `${BASE_URL}/referrals/`;
 export const CREATE_REFERRAL_URL = `${BASE_URL}/referrals/`;
 export const GET_REWARDS_URL = `${BASE_URL}/rewards/`;
 export const CREATE_REWARD_URL = `${BASE_URL}/rewards/`;
+export const GET_WITHDRAWAL_REQUESTS_URL = `${BASE_URL}/withdrawal-requests/`;
+export const CREATE_WITHDRAWAL_REQUEST_URL = `${BASE_URL}/withdrawal-requests/`;

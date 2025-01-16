@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-const SuccessModal2 = ({ isVisible, service }) => {
+const SuccessModal2 = ({ isVisible, onClose,service }) => {
   const router = useRouter();
 
   const handleNext = () => {
     router.push('/create-trading-account');
+    onClose();
   };
 
   return (

@@ -44,6 +44,7 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+
   const handlePayment = async () => {
     if (!phone_number) {
       setError('Please enter your phone number.');
@@ -75,6 +76,10 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
             <SuccessModal
               isVisible={success}
               service={service}
+              onClose={ () => {
+                setSuccess(false);
+                onClose();
+              } }
             />
           ) : (
             <>

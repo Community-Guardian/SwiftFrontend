@@ -100,12 +100,15 @@ export default function InvestScreen() {
               <Text style={[styles.serviceName, { color: themeColors.text }]}>
                 {item.name}
               </Text>
+              <Text style={[styles.description, { color: themeColors.text }]}>
+                {item.description || "No description available for this plan."}
+              </Text>
               <View style={styles.investmentInfo}>
                 <View style={[styles.amountContainer, { backgroundColor: themeColors.primary }]}>
                   <Text style={styles.amount}>KSH {item.price}</Text>
                 </View>
                 <View style={[styles.durationContainer, { backgroundColor: themeColors.secondary }]}>
-                  <Text style={styles.duration}>{item.duration}</Text>
+                  <Text style={styles.duration}>{item.duration} Days</Text>
                 </View>
               </View>
               <TouchableOpacity
