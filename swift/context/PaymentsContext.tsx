@@ -2,7 +2,12 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import paymentsManager from '../handler/PaymentsManager';
-
+import {
+  Pusher,
+  PusherMember,
+  PusherChannel,
+  PusherEvent,
+} from '@pusher/pusher-websocket-react-native';
 interface ServiceType {
   id: number;
   name: string;
@@ -57,7 +62,29 @@ const PaymentsContext = createContext<PaymentsContextProps | undefined>(undefine
 export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const pusher = Pusher.getInstance();
 
+    // Enable Pusher debug mode for better troubleshooting
+    Pusher.logToConsole = true;
+
+    // Initialize Pusher
+    pusher.init({
+      apiKey: "38281af5b75dff37a915",
+      cluster: "eu",
+    });
+
+    // Log connection states
+    pusher.connection.bind('state_change', (states) => {
+      console.log('Pusher connection state:', states);
+    });
+
+    pusher.connect();
+
+    return () => {
+      pusher.disconnect();
+    };
+  }, []);
   const getPayments = async () => {
     setLoading(true);
     try {
@@ -109,11 +136,28 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
-
   const createMpesaPaymentIntent = async (serviceId: number, phone_number: string) => {
     setLoading(true);
     try {
       await paymentsManager.createMpesaPaymentIntent(serviceId, phone_number);
+
+      const pusher = Pusher.getInstance();
+      const channel = await pusher.subscribe('payment-channel');
+
+      channel.on('payment-intent-created', (data) => {
+        console.log('Received payment intent event:', data);
+        
+        const { status_code, user_id, service_id } = data;
+        if (status_code === 201) {
+          console.log('Payment intent created successfully');
+        } else {
+          console.error('Failed to create payment intent');
+        }
+
+        // Unsubscribe after receiving the event
+        channel.unbind('payment-intent-created');
+        pusher.unsubscribe('payment-channel');
+      });
     } catch (error) {
       console.error('Failed to create Mpesa payment intent', error);
     } finally {

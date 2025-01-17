@@ -11,15 +11,42 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the response data structure for payments
-interface Payment {
+interface ServiceType {
   id: number;
-  service: string;
+  name: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Service {
+  id: number;
+  service_type: ServiceType;
+  name: string;
+  price: string;
+  description: string;
+  link: string;
+  duration: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  image: string;
+}
+
+interface Payment {
+  id: string;
+  service_id: number;
+  service: Service;
   payment_method: string;
+  result_code: string;
+  result_desc: string;
   payment_status: string;
-  amount: number;
+  amount: string;
   transaction_id: string;
   created_at: string;
   updated_at: string;
+  user: string;
+  service_type: ServiceType | null;
 }
 
 // Define the error response structure
@@ -134,7 +161,7 @@ class PaymentsManager {
     }
   }
 
-  async updatePayment(id: number, paymentData: Partial<Payment>): Promise<Payment | undefined> {
+  async updatePayment(id: string, paymentData: Partial<Payment>): Promise<Payment | undefined> {
     try {
       const response = await api.put<Payment>(UPDATE_PAYMENT_URL(id), paymentData);
       return response.data;
@@ -144,7 +171,7 @@ class PaymentsManager {
     }
   }
 
-  async deletePayment(id: number): Promise<void> {
+  async deletePayment(id: string): Promise<void> {
     try {
       await api.delete(DELETE_PAYMENT_URL(id));
     } catch (error) {

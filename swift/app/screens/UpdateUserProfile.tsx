@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 export default function UpdateUserProfileScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, } = useAuth();
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
   const [firstName, setFirstName] = useState(user?.first_name || '');
