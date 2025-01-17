@@ -12,6 +12,8 @@ import { ThemeProvider,useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/styles/theme';
 import { TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ReferralsProvider } from '@/context/ReferralsContext';
+import { FinanceProvider } from '@/context/FinanceContext';
 function BackButton() {
   const router = useRouter();
   const { theme } = useTheme();
@@ -73,7 +75,12 @@ function AppContent() {
         name="UpdateUserProfile"
         options={{ title: 'User Profile', headerLeft: () => <BackButton /> }}
       />
+      <Stack.Screen
+        name="TrackInvestments"
+        options={{ title: 'Investments', headerLeft: () => <BackButton /> }}
+      />
     </Stack>
+
   );
 }
 export default function ScreensLayout() {
@@ -84,7 +91,11 @@ export default function ScreensLayout() {
         <FeedbackProvider>
           <ArticlesProvider>
             <NotificationsProvider>
-              <AppContent />
+              <ReferralsProvider>
+                <FinanceProvider>
+                        <AppContent />
+                </FinanceProvider>
+              </ReferralsProvider>
             </NotificationsProvider>
           </ArticlesProvider>
         </FeedbackProvider>

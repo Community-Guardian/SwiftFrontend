@@ -232,3 +232,44 @@ export const GET_REWARDS_URL = `${BASE_URL}/rewards/`;
 export const CREATE_REWARD_URL = `${BASE_URL}/rewards/`;
 export const GET_WITHDRAWAL_REQUESTS_URL = `${BASE_URL}/withdrawal-requests/`;
 export const CREATE_WITHDRAWAL_REQUEST_URL = `${BASE_URL}/withdrawal-requests/`;
+
+// Finance endpoints
+/**
+ * Get all investments or a specific investment by ID.
+ */
+export const GET_INVESTMENTS_URL = `${BASE_URL}/investments/`;
+
+/**
+ * Create a new investment.
+ */
+export const CREATE_INVESTMENT_URL = `${BASE_URL}/investments/`;
+
+/**
+ * Update a specific investment by ID.
+ */
+export const UPDATE_INVESTMENT_URL = (id: number) => `${BASE_URL}/investments/${id}/`;
+
+/**
+ * Delete a specific investment by ID.
+ */
+export const DELETE_INVESTMENT_URL = (id: number) => `${BASE_URL}/investments/${id}/`;
+
+/**
+ * Get all financial reports or a specific financial report by ID.
+ */
+export const GET_FINANCIAL_REPORTS_URL = `${BASE_URL}/financial-reports/`;
+
+/**
+ * Create a new financial report.
+ */
+export const CREATE_FINANCIAL_REPORT_URL = `${BASE_URL}/financial-reports/`;
+
+/**
+ * Update a specific financial report by ID.
+ */
+export const UPDATE_FINANCIAL_REPORT_URL = (id: number) => `${BASE_URL}/financial-reports/${id}/`;
+
+/**
+ * Delete a specific financial report by ID.
+ */
+export const DELETE_FINANCIAL_REPORT_URL = (id: number) => `${BASE_URL}/financial-reports/${id}/`;

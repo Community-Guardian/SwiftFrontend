@@ -8,9 +8,10 @@ interface CustomInputProps {
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
+  keyboardType?: string;
 }
 
-export function CustomInput({ placeholder, value, onChangeText, secureTextEntry }: CustomInputProps) {
+export function CustomInput({ placeholder, value, onChangeText, secureTextEntry,keyboardType }: CustomInputProps) {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
 
