@@ -2,6 +2,7 @@
   "expo": {
     "name": "swift",
     "slug": "swift",
+    "owner":"community-guardian",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash.png",
@@ -9,16 +10,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "googleMobileAdsAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/splash.png",
         "backgroundColor": "#ffffff"
       },
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~3347511713"
-      },
+
       "package": "com.nrad8394.swift"
     },
     "web": {
@@ -35,6 +35,13 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-4992853013448912~4918403340"
+          
         }
       ]
     ],
