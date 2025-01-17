@@ -11,6 +11,7 @@ import { ArticlesProvider } from '@/context/ArticlesContext';
 import { NotificationsProvider } from '@/context/NotificationsContext';
 import { ReferralsProvider } from '@/context/ReferralsContext';
 import { RedirectProvider } from '@/context/RedirectContext';
+import { FinanceProvider } from '@/context/FinanceContext';
 import { useTheme } from '@/context/ThemeContext';
 function AppContent() {
   const { theme } = useTheme();
@@ -100,7 +101,9 @@ export default function TabLayout() {
               <ArticlesProvider>
                 <NotificationsProvider>
                   <ReferralsProvider>
-                    <AppContent />
+                    <FinanceProvider>
+                        <AppContent />
+                    </FinanceProvider>
                   </ReferralsProvider>
                 </NotificationsProvider>
               </ArticlesProvider>

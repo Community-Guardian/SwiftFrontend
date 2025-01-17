@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
@@ -16,36 +16,45 @@ export default function UpdateUserProfileScreen() {
   const [referralCode] = useState(user?.referral_code || '');
   const [image, setImage] = useState(user?.image || '');
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-
   const handleUpdate = async () => {
     try {
       if (user) {
-        // Create a FormData object for submitting data
+        // Create a FormData object
         const formPayload = new FormData();
-  
-        // Append form fields
+    
+        // Append text fields
         formPayload.append('username', username);
         formPayload.append('email', email);
         formPayload.append('first_name', firstName);
         formPayload.append('last_name', lastName);
         formPayload.append('referral_code', referralCode);
-  
-        // Append image file if it exists
+    
+        // Check if there's an image and append it to the FormData
         if (image) {
-          const uriParts = image.split('.');
-          const fileType = uriParts[uriParts.length - 1];
-          const response = await fetch(image);
-          const blob = await response.blob();
-          formPayload.append('image', blob, `photo.${fileType}`);
+          const fileName = image.split('/').pop();  // Extract filename
+          const fileType = fileName?.split('.').pop(); // Extract file extension/type
+  
+          // Ensure 'image' is treated as a file with the proper name and type
+          formPayload.append('image', {
+            uri: image,
+            name: fileName, // Set the file name
+            type: `image/${fileType}`, // Set the file type
+          } as any); // Explicitly tell TypeScript it's a file object
         }
   
-        // Call the API to update the profile
+        // Log form data (optional for debugging)
+        for (let pair of formPayload.entries()) {
+          console.log(pair[0] + ': ' + pair[1]);
+        }
+  
+        // Submit the form
         await updateUser(user.id, formPayload);
         setMessage({ text: 'Profile updated successfully!', type: 'success' });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage({ text: 'Failed to update profile.', type: 'error' });
+      Alert.alert('Error', 'Failed to update profile. Please try again.');
     }
   };
 
@@ -56,7 +65,6 @@ export default function UpdateUserProfileScreen() {
       aspect: [1, 1],
       quality: 1,
     });
-
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setImage(result.assets[0].uri);
     }

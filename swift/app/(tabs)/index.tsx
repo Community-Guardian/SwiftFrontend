@@ -104,16 +104,16 @@ export default function HomeScreen() {
           ].map((item, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => router.push(item.route)}
+              onPress={() => router.push(item.route as any)}
               style={styles.cardWrapper}
             >
               <LinearGradient
-                colors={item.colors}
+                colors={item.colors as [string, string]}
                 style={styles.card}
                 start={[0, 0]}
                 end={[1, 1]}
               >
-                <Text style={[styles.cardText, { color: themeColors.cardText }]}>{item.title}</Text>
+                <Text style={[styles.cardText, { color: themeColors.text }]}>{item.title}</Text>
               </LinearGradient>
             </TouchableOpacity>
           ))}
@@ -139,7 +139,7 @@ export default function HomeScreen() {
           <LinearGradient colors={['#8E2DE2', '#4A00E0']} style={styles.rewardsCard}>
             <Text style={styles.rewardTitle}>Track Investments</Text>
             <Text style={styles.rewardNote}>Monitor your ongoing investments here.</Text>
-            <TouchableOpacity onPress={() => router.push('/track')}>
+            <TouchableOpacity onPress={() => router.push('/screens/TrackInvestments')}>
               <Text style={styles.rewardNote}>View Details</Text>
             </TouchableOpacity>
           </LinearGradient>
