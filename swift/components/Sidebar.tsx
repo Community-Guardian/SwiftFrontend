@@ -6,7 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 
-export const Sidebar = ({ closeSidebar }) => {
+interface SidebarProps {
+  closeSidebar: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ closeSidebar }) => {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const router = useRouter();
@@ -25,9 +29,9 @@ export const Sidebar = ({ closeSidebar }) => {
       icon: 'log-out',
       title: 'Log Out',
       action: () => {
-        logout(); // Call the logout function
         closeSidebar(); // Close the sidebar after logout
-        router.push('/login'); // Redirect to the login page
+        logout(); // Call the logout function
+        router.push('/(auth)'); // Redirect to the login page
       },
     },
   ];

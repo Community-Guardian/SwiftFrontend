@@ -2,7 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const SuccessModal = ({ isVisible, onClose, service }) => {
+interface SuccessModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  service: {
+    name: string;
+    link: string;
+  };
+}
+
+const SuccessModal: React.FC<SuccessModalProps> = ({ isVisible, onClose, service }) => {
   const handleJoinGroup = () => {
     Linking.openURL(service.link);
   };

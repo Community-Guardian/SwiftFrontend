@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { usePayments } from '../context/PaymentsContext';
 import SuccessModal from './SuccessModal2';
+import { useRouter } from 'expo-router';
 
 interface ServiceType {
   id: number;
@@ -36,15 +37,18 @@ interface PayModalProps {
     image: string;
   };
 }
-
 const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
+  const router = useRouter();
   const { createMpesaPaymentIntent } = usePayments();
   const [phone_number, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-
+  const handleNext = () => {
+    router.push('/create-trading-account');
+    onClose();
+  };
   const handlePayment = async () => {
     if (!phone_number) {
       setError('Please enter your phone number.');
@@ -95,7 +99,7 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
                 value={phone_number}
                 onChangeText={setPhoneNumber}
               />
-              <TouchableOpacity onPress={handlePayment} style={styles.payButton}>
+              <TouchableOpacity onPress={handleNext} style={styles.payButton}>
                 <Text style={styles.payButtonText}>Confirm Payment</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>

@@ -55,7 +55,7 @@ export default function EarnScreen() {
         Referred: {item.referred || 'N/A'}
       </Text>
       <Text style={[styles.referralText, { color: themeColors.text }]}>
-        Reward: ${item.reward_amount}
+        Reward: Ksh {item.reward_amount}
       </Text>
       <Text style={[styles.referralText, { color: themeColors.text }]}>
         Date: {new Date(item.created_at).toLocaleDateString()}
@@ -90,7 +90,6 @@ export default function EarnScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -127,12 +126,31 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   referralCard: {
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 10,
+    padding: 18,
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4, // for Android shadow
   },
   referralText: {
+    fontSize: 16,
+    marginBottom: 8,
+    color: '#333',
+  },
+  referralSubText: {
     fontSize: 14,
+    color: '#888',
     marginBottom: 5,
+  },
+  rewardText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4caf50', // green for reward amount
   },
 });

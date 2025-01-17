@@ -3,7 +3,13 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-const SuccessModal2 = ({ isVisible, onClose,service }) => {
+interface SuccessModal2Props {
+  isVisible: boolean;
+  onClose: () => void;
+  service: { name: string };
+}
+
+const SuccessModal2: React.FC<SuccessModal2Props> = ({ isVisible, onClose, service }) => {
   const router = useRouter();
 
   const handleNext = () => {
