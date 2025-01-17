@@ -20,6 +20,15 @@ import {
 import { router } from "expo-router";
 import { CustomButton } from "@/components/CustomButton";
 
+
+import 'expo-dev-client';
+
+
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+
+
 interface ServiceType {
   id: number;
   name: string;
@@ -125,9 +134,11 @@ export default function VerifyAccountScreen() {
             loading={loading}
             disabled={!service}
           />
-        </CardFooter>
+      </CardFooter>
       </Card>
 
+      {/* Banner Ad */}
+      <BannerAd unitId={adUnitId} size={BannerAdSize.BANNER} />  
       {service && (
         <PayModal
           isVisible={isPaymentModalVisible}
