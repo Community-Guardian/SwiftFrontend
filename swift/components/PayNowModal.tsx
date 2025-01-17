@@ -11,7 +11,33 @@ import {
 import { usePayments } from '../context/PaymentsContext';
 import SuccessModal from './SuccessModal';
 
-const PayNowModal = ({ isVisible, onClose, service }) => {
+interface ServiceType {
+  id: number;
+  name: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+interface PayModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  service: {
+    id: number;
+    name: string;
+    service_type: ServiceType; // Nested service type object
+    service_type_id: string; 
+    price: number;
+    description: string;
+    link: string;
+    duration: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    image: string;
+  };
+}
+
+const PayNowModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
   const { createMpesaPaymentIntent } = usePayments();
   const [phone_number, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,8 +58,8 @@ const PayNowModal = ({ isVisible, onClose, service }) => {
     try {
       await createMpesaPaymentIntent( service.id, phone_number );
       setSuccess(true);
-    } catch (err) {
-      setError('Payment failed. Please try again.');
+    } catch (error: any) {
+      setError(error);
     } finally {
       setLoading(false);
     }

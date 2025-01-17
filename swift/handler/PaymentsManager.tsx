@@ -10,7 +10,6 @@ import {
 } from '@/handler/apiConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define the response data structure for payments
 interface ServiceType {
   id: number;
   name: string;
@@ -21,9 +20,10 @@ interface ServiceType {
 
 interface Service {
   id: number;
-  service_type: ServiceType;
   name: string;
-  price: string;
+  service_type: ServiceType; // Nested service type object
+  service_type_id: string; 
+  price: number;
   description: string;
   link: string;
   duration: string;
@@ -189,7 +189,7 @@ class PaymentsManager {
     }
   }
 
-  async refundPayment(paymentId: number, refundAmount: number, phone_number: string): Promise<void> {
+  async refundPayment(paymentId: string, refundAmount: number, phone_number: string): Promise<void> {
     try {
       await api.post(REFUND_PAYMENT_URL, { paymentId, refundAmount, phone_number });
     } catch (error) {

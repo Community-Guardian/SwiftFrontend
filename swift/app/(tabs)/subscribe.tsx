@@ -46,9 +46,9 @@ export default function SubscribeScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { services, getServices } = useServices();
-  const [filteredServices, setFilteredServices] = useState<Service | null>(null);
+  const [filteredServices, setFilteredServices] = useState<Service[] | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Added loading state
   const [isServiceDetailsModalVisible, setServiceDetailsModalVisible] = useState(false);
@@ -65,7 +65,7 @@ export default function SubscribeScreen() {
     }
   }, [services]);
 
-  const handleSearch = (text) => {
+  const handleSearch = (text: any) => {
     setSearchQuery(text);
     const filtered = services.filter(
       (service) =>
@@ -78,13 +78,9 @@ export default function SubscribeScreen() {
     setSelectedService(service);
     setServiceDetailsModalVisible(true);
   };
-  const handlePayNow = (service) => {
+  const handlePayNow = (service:Service) => {
     setSelectedService(service);
     setModalVisible(true);
-  };
-
-  const handleView = (link) => {
-    Linking.openURL(link);
   };
 
   return (

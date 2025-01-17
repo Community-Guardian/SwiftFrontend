@@ -1,13 +1,8 @@
-"use client"
+"use client";
 
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import paymentsManager from '../handler/PaymentsManager';
-import {
-  Pusher,
-  PusherMember,
-  PusherChannel,
-  PusherEvent,
-} from '@pusher/pusher-websocket-react-native';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import paymentsManager from "../handler/PaymentsManager";
+
 interface ServiceType {
   id: number;
   name: string;
@@ -18,9 +13,10 @@ interface ServiceType {
 
 interface Service {
   id: number;
-  service_type: ServiceType;
   name: string;
-  price: string;
+  service_type: ServiceType; // Nested service type object
+  service_type_id: string; 
+  price: number;
   description: string;
   link: string;
   duration: string;
@@ -29,7 +25,6 @@ interface Service {
   updated_at: string;
   image: string;
 }
-
 interface Payment {
   id: string;
   service_id: number;
@@ -62,36 +57,14 @@ const PaymentsContext = createContext<PaymentsContextProps | undefined>(undefine
 export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const pusher = Pusher.getInstance();
 
-    // Enable Pusher debug mode for better troubleshooting
-    Pusher.logToConsole = true;
-
-    // Initialize Pusher
-    pusher.init({
-      apiKey: "38281af5b75dff37a915",
-      cluster: "eu",
-    });
-
-    // Log connection states
-    pusher.connection.bind('state_change', (states) => {
-      console.log('Pusher connection state:', states);
-    });
-
-    pusher.connect();
-
-    return () => {
-      pusher.disconnect();
-    };
-  }, []);
   const getPayments = async () => {
     setLoading(true);
     try {
       const data = await paymentsManager.getPayments();
       setPayments(data);
     } catch (error) {
-      console.error('Failed to fetch payments', error);
+      console.error("Failed to fetch payments", error);
     } finally {
       setLoading(false);
     }
@@ -105,7 +78,7 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
         setPayments([...payments, newPayment]);
       }
     } catch (error) {
-      console.error('Failed to create payment', error);
+      console.error("Failed to create payment", error);
     } finally {
       setLoading(false);
     }
@@ -116,10 +89,10 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
     try {
       const updatedPayment = await paymentsManager.updatePayment(id, paymentData);
       if (updatedPayment) {
-        setPayments(payments.map(payment => (payment.id === id ? updatedPayment : payment)));
+        setPayments(payments.map((payment) => (payment.id === id ? updatedPayment : payment)));
       }
     } catch (error) {
-      console.error('Failed to update payment', error);
+      console.error("Failed to update payment", error);
     } finally {
       setLoading(false);
     }
@@ -129,37 +102,35 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       await paymentsManager.deletePayment(id);
-      setPayments(payments.filter(payment => payment.id !== id));
+      setPayments(payments.filter((payment) => payment.id !== id));
     } catch (error) {
-      console.error('Failed to delete payment', error);
+      console.error("Failed to delete payment", error);
     } finally {
       setLoading(false);
     }
   };
+
   const createMpesaPaymentIntent = async (serviceId: number, phone_number: string) => {
     setLoading(true);
     try {
-      await paymentsManager.createMpesaPaymentIntent(serviceId, phone_number);
+      const paymentIntent = await paymentsManager.createMpesaPaymentIntent(serviceId, phone_number);
+      if (paymentIntent) {
+        console.log("Payment intent created:", paymentIntent);
 
-      const pusher = Pusher.getInstance();
-      const channel = await pusher.subscribe('payment-channel');
-
-      channel.on('payment-intent-created', (data) => {
-        console.log('Received payment intent event:', data);
-        
-        const { status_code, user_id, service_id } = data;
-        if (status_code === 201) {
-          console.log('Payment intent created successfully');
-        } else {
-          console.error('Failed to create payment intent');
+        // Wait for 60 seconds before processing the payment object
+        await new Promise((resolve) => setTimeout(resolve, 30000));
+        await getPayments();
+        const payments = await paymentsManager.getPayments();
+        const newPayment = payments.find((payment) => payment.id === paymentIntent.id);
+        if (newPayment?.payment_status!="paid")  {  
+          throw new Error(newPayment?.result_desc);
         }
-
-        // Unsubscribe after receiving the event
-        channel.unbind('payment-intent-created');
-        pusher.unsubscribe('payment-channel');
-      });
+      }
+      else{
+        throw new Error("Payment unsucessfull please try again");
+      }
     } catch (error) {
-      console.error('Failed to create Mpesa payment intent', error);
+      throw new Error("Payment unsucessfull please try again");
     } finally {
       setLoading(false);
     }
@@ -170,7 +141,7 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
     try {
       await paymentsManager.refundPayment(paymentId, refundAmount, phone_number);
     } catch (error) {
-      console.error('Failed to refund payment', error);
+      console.error("Failed to refund payment", error);
     } finally {
       setLoading(false);
     }
@@ -181,7 +152,18 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <PaymentsContext.Provider value={{ payments, loading, getPayments, createPayment, updatePayment, deletePayment, createMpesaPaymentIntent, refundPayment }}>
+    <PaymentsContext.Provider
+      value={{
+        payments,
+        loading,
+        getPayments,
+        createPayment,
+        updatePayment,
+        deletePayment,
+        createMpesaPaymentIntent,
+        refundPayment,
+      }}
+    >
       {children}
     </PaymentsContext.Provider>
   );
@@ -190,7 +172,7 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
 export const usePayments = () => {
   const context = useContext(PaymentsContext);
   if (context === undefined) {
-    throw new Error('usePayments must be used within a PaymentsProvider');
+    throw new Error("usePayments must be used within a PaymentsProvider");
   }
   return context;
 };

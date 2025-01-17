@@ -1,5 +1,5 @@
-// const BASE_URL = 'https://swift8393.pythonanywhere.com';
-const BASE_URL = 'http://10.10.86.109:80';
+const BASE_URL = 'https://swift8393.pythonanywhere.com';
+// const BASE_URL = 'http://10.10.86.109:80';
 export { BASE_URL };
 // User endpoints
 /**
@@ -86,12 +86,12 @@ export const CREATE_PAYMENT_URL = `${BASE_URL}/payments/`;
 /**
  * Update a specific payment by ID.
  */
-export const UPDATE_PAYMENT_URL = (id: number) => `${BASE_URL}/payments/${id}/`;
+export const UPDATE_PAYMENT_URL = (id: string) => `${BASE_URL}/payments/${id}/`;
 
 /**
  * Delete a specific payment by ID.
  */
-export const DELETE_PAYMENT_URL = (id: number) => `${BASE_URL}/payments/${id}/`;
+export const DELETE_PAYMENT_URL = (id: string) => `${BASE_URL}/payments/${id}/`;
 
 /**
  * Create an Mpesa payment intent.

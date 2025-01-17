@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Share } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Share, FlatList } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useReferrals } from '../../context/ReferralsContext';
 import { useAuth } from '../../context/AuthContext';
 import { useRedirect } from '../../context/RedirectContext';
 
+interface Referral {
+  id: number;
+  referrer: string;
+  referred?: string | null;
+  referral_code: string;
+  reward_amount: string;
+  created_at: string;
+  is_successful: boolean;
+}
+
 export default function EarnScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { user } = useAuth();
   const { referrals, getReferrals, createReferral, loading } = useReferrals();
-  const { createReferralLink, handleRedirect } = useRedirect();
+  const { createReferralLink } = useRedirect();
 
   useEffect(() => {
     getReferrals();
@@ -26,15 +36,10 @@ export default function EarnScreen() {
         });
 
         if (result.action === Share.sharedAction) {
-          if (result.activityType) {
-            // shared with activity type of result.activityType
-          } else {
-            // shared
+          if (!result.activityType) {
             await createReferral({ referrer: user.referral_code });
             Alert.alert('Success', 'Referral sent successfully!');
           }
-        } else if (result.action === Share.dismissedAction) {
-          // dismissed
         }
       } catch (error) {
         Alert.alert('Error', 'Failed to send referral.');
@@ -43,6 +48,20 @@ export default function EarnScreen() {
       Alert.alert('Error', 'User referral code not found.');
     }
   };
+
+  const renderReferral = ({ item }: { item: Referral }) => (
+    <View style={[styles.referralCard, { backgroundColor: themeColors.card }]}>
+      <Text style={[styles.referralText, { color: themeColors.text }]}>
+        Referred: {item.referred || 'N/A'}
+      </Text>
+      <Text style={[styles.referralText, { color: themeColors.text }]}>
+        Reward: ${item.reward_amount}
+      </Text>
+      <Text style={[styles.referralText, { color: themeColors.text }]}>
+        Date: {new Date(item.created_at).toLocaleDateString()}
+      </Text>
+    </View>
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
@@ -56,7 +75,18 @@ export default function EarnScreen() {
       </TouchableOpacity>
 
       <Text style={[styles.referralsTitle, { color: themeColors.text }]}>Your Referrals</Text>
-      {/* Render referrals list */}
+      {loading ? (
+        <Text style={{ color: themeColors.text, textAlign: 'center' }}>Loading referrals...</Text>
+      ) : referrals.length > 0 ? (
+        <FlatList
+          data={referrals}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderReferral}
+          contentContainerStyle={styles.referralsList}
+        />
+      ) : (
+        <Text style={{ color: themeColors.text, textAlign: 'center' }}>No referrals yet.</Text>
+      )}
     </View>
   );
 }
@@ -92,5 +122,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  referralsList: {
+    paddingBottom: 20,
+  },
+  referralCard: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  referralText: {
+    fontSize: 14,
+    marginBottom: 5,
   },
 });

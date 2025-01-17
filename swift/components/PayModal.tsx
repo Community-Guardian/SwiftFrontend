@@ -59,8 +59,8 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
     try {
       await createMpesaPaymentIntent( service.id, phone_number );
       setSuccess(true);
-    } catch (err) {
-      setError('Payment failed. Please try again.');
+    } catch (error: any) {
+      setError(error);
     } finally {
       setLoading(false);
     }

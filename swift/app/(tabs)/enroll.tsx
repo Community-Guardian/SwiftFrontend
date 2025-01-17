@@ -109,7 +109,7 @@ export default function EnrollScreen() {
                     {item.name}
                   </Text>
                   <View style={styles.ratingContainer}>
-                    {renderStars(item.rating || 5)}
+                    {renderStars(5)}
                   </View>
                   <View style={styles.courseDetails}>
                     <Text style={[styles.duration, { backgroundColor: '#4CAF50' }]}>
