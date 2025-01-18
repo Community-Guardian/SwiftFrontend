@@ -6,7 +6,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Linking,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
@@ -15,33 +15,56 @@ import { usePayments } from '@/context/PaymentsContext';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
-  interface ServiceType {
-    id: number;
-    name: string;
-    icon: string;
-    created_at: string;
-    updated_at: string;
-  }
-  
-  interface Service {
-    id: number;
-    name: string;
-    service_type: ServiceType; // Nested service type object
-    service_type_id: string; 
-    price: number;
-    description: string;
-    link: string;
-    duration: string;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
-    image: string;
-  }
+
+interface ServiceType {
+  id: number;
+  name: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  service_type: ServiceType; // Nested service type object
+  service_type_id: string;
+  price: number;
+  description: string;
+  link: string;
+  duration: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  image: string;
+}
+interface Payment {
+  id: string;
+  service_id: number;
+  service: Service;
+  payment_method: string;
+  result_code: string;
+  result_desc: string;
+  payment_status: string;
+  amount: string;
+  transaction_id: string;
+  created_at: string;
+  updated_at: string;
+  user: string;
+  service_type: ServiceType | null;
+  expiration_date: string; // ISO date string
+  is_expired: boolean; // Whether the service has expired
+  total_amount_paid: number; // Total amount paid for the service
+}
+
+
 export default function PaidServicesScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { payments, getPayments, loading } = usePayments();
-  const [paidServices, setPaidServices] = useState<Service[]>([]);
+  const [paidServices, setPaidServices] = useState<Payment[]>([]);
+  const [selectedService, setSelectedService] = useState<Payment | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     // Trigger the loading state and fetch data
@@ -49,13 +72,21 @@ export default function PaidServicesScreen() {
   }, []);
 
   useEffect(() => {
-    // Map payments data to services after fetching
-    const services = payments.map((payment) => payment.service);
+    // Filter payments with payment_status equal to 'paid' and map to services
+    const services = payments
+      .filter((payment) => payment.payment_status === 'paid')
+      // .map((payment) => payment);
     setPaidServices(services);
   }, [payments]);
 
-  const handleView = (link: string) => {
-    Linking.openURL(link);
+  const handleView = (service: Payment) => {
+    setSelectedService(service);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedService(null);
   };
 
   // Show loading indicator while the data is being fetched
@@ -78,24 +109,26 @@ export default function PaidServicesScreen() {
           renderItem={({ item }) => (
             <View style={[styles.serviceCard, { backgroundColor: themeColors.card }]}>
               <Image
-                source={{ uri: item.image || DEFAULT_IMAGE }}
+                source={{ uri: item.service.image || DEFAULT_IMAGE }}
                 style={styles.serviceImage}
                 resizeMode="cover"
               />
               <View style={styles.serviceInfo}>
-                <Text style={[styles.serviceTitle, { color: themeColors.text }]}>{item.name}</Text>
+                <Text style={[styles.serviceTitle, { color: themeColors.text }]}>{item.service.name}</Text>
                 <Text
                   style={[styles.serviceDescription, { color: themeColors.text }]}
                   numberOfLines={2}
                 >
-                  {item.description}
+                  {item.service.description}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleView(item.link)}
-                  style={[styles.viewButton, { backgroundColor: themeColors.primary }]}
-                >
-                  <Text style={styles.viewButtonText}>View</Text>
-                </TouchableOpacity>
+                {item.service.service_type.name !== 'Activate your account' && (
+                  <TouchableOpacity
+                    onPress={() => handleView(item)}
+                    style={[styles.viewButton, { backgroundColor: themeColors.primary }]}
+                  >
+                    <Text style={styles.viewButtonText}>View</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           )}
@@ -107,6 +140,95 @@ export default function PaidServicesScreen() {
           </Text>
         </View>
       )}
+
+      {/* Modal for viewing payment details */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={[styles.modalContent, { backgroundColor: themeColors.card }]}>
+            {selectedService && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={[styles.modalTitle, { color: themeColors.text }]}>
+                    {selectedService.service.name}
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusDot,
+                      {
+                        backgroundColor: selectedService.is_expired
+                          ? 'red'
+                          : 'green',
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={[styles.modalDescription, { color: themeColors.text }]}>
+                  {selectedService.service.description}
+                </Text>
+                <View style={styles.modalDetailRow}>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
+                    Price:
+                  </Text>
+                  <Text style={[styles.modalValue, { color: themeColors.text }]}>
+                    Ksh {selectedService.service.price}
+                  </Text>
+                </View>
+                <View style={styles.modalDetailRow}>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
+                    Duration:
+                  </Text>
+                  <Text style={[styles.modalValue, { color: themeColors.text }]}>
+                    {selectedService.service.duration} days
+                  </Text>
+                </View>
+                <View style={styles.modalDetailRow}>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
+                    Purchased on:
+                  </Text>
+                  <Text style={[styles.modalValue, { color: themeColors.text }]}>
+                    {new Date(selectedService.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+                <View style={styles.modalDetailRow}>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
+                    Expires on:
+                  </Text>
+                  <Text style={[styles.modalValue, { color: themeColors.text }]}>
+                    {selectedService.expiration_date
+                      ? new Date(selectedService.expiration_date).toLocaleDateString()
+                      : 'N/A'}
+                  </Text>
+                </View>
+                <View style={styles.modalDetailRow}>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
+                    Status:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.modalValue,
+                      {
+                        color: selectedService.service.is_active ? 'blue' : 'red',
+                        fontWeight: 'bold',
+                      },
+                    ]}
+                  >
+                    {selectedService.service.is_active ? 'Active' : 'Expired'}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
@@ -176,5 +298,68 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    padding: 20,
+    borderRadius: 12,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  modalDetailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  modalLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  modalValue: {
+    fontSize: 16,
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  modalPrice: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  modalDuration: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  closeButton: {
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: '#2196F3',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

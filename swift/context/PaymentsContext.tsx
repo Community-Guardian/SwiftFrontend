@@ -39,7 +39,11 @@ interface Payment {
   updated_at: string;
   user: string;
   service_type: ServiceType | null;
+  expiration_date: string; // ISO date string
+  is_expired: boolean; // Whether the service has expired
+  total_amount_paid: number; // Total amount paid for the service
 }
+
 
 interface PaymentsContextProps {
   payments: Payment[];
@@ -117,8 +121,8 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
       if (paymentIntent) {
         console.log("Payment intent created:", paymentIntent);
 
-        // Wait for 60 seconds before processing the payment object
-        await new Promise((resolve) => setTimeout(resolve, 30000));
+        // Wait for 25 seconds before processing the payment object
+        await new Promise((resolve) => setTimeout(resolve, 25000));
         await getPayments();
         const payments = await paymentsManager.getPayments();
         const newPayment = payments.find((payment) => payment.id === paymentIntent.id);

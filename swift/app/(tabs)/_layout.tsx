@@ -50,6 +50,7 @@ function AppContent() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Ionicons name="home" size={24} color={color} />,
+          headerShown: false, // Hide the header
         }}
       />
       <Tabs.Screen

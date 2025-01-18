@@ -7,14 +7,41 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CreateTradingAccountProvider } from '@/context/CreateTradingAccountContext';
 
 import { LogoutProvider } from '@/context/LogoutContext';
+import mobileAds from 'react-native-google-mobile-ads';
+import {
+  getTrackingPermissionsAsync,
+  PermissionStatus,
+  requestTrackingPermissionsAsync,
+} from 'expo-tracking-transparency';
 
+
+
+import { useEffect, useState } from 'react';
 
 function AppContent() {
   const { isConnected } = useConnectivity();
   const { isAuthenticated } = useAuth();
+  const [initialized, setInitialized] = useState(false);
 
+  useEffect(() => {
+    async function initialize() {
+      const { status } = await getTrackingPermissionsAsync();
+      if (status === PermissionStatus.UNDETERMINED) {
+        await requestTrackingPermissionsAsync();
+      }
 
-  
+      await mobileAds().initialize();
+      setInitialized(true);
+    }
+
+    initialize();
+  }, []);
+
+  if (!initialized) {
+    // Render a loading screen or nothing while initializing
+    return null;
+  }
+
   if (!isAuthenticated) {
     // Render authentication-related screens
     return (
@@ -22,17 +49,6 @@ function AppContent() {
         headerShown: false, // Hide the header
       }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack>
-    );
-  }
-  if (isAuthenticated) {
-    // Render other-related screens
-    return (
-      <Stack screenOptions={{
-        headerShown: false, // Hide the header
-      }}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="screens" options={{ headerShown: false }} />      
       </Stack>
     );
   }
@@ -47,7 +63,6 @@ function AppContent() {
     <Stack screenOptions={{
       headerShown: false, // Hide the header
     }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="screens" options={{ headerShown: false }} />
     </Stack>

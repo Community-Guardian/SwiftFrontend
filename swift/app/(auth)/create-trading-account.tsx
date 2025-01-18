@@ -4,18 +4,12 @@ import { useRouter } from 'expo-router';
 import { useCreateTradingAccount } from '@/context/CreateTradingAccountContext';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-
-
-
-
-
-
 import 'expo-dev-client';
 
 
 import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
-const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-3868898371251417/3578299301';
 
 
 
@@ -38,9 +32,8 @@ const CreateTradingAccountScreen = () => {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Animated.View entering={FadeInDown.delay(300).duration(1000)} style={styles.card}>
-
-                {/* Banner Ad */}
-                <BannerAd unitId={adUnitId} size={BannerAdSize.BANNER} />  
+            {/* Banner Ad */}    
+            <BannerAd unitId={adUnitId} size={BannerAdSize.BANNER} />  
           <Ionicons name="wallet-outline" size={80} color="#4158D0" style={styles.icon} />
           <Animated.Text entering={FadeInUp.delay(600).duration(1000)} style={styles.title}>Create Trading Account</Animated.Text>
           <Animated.Text entering={FadeInUp.delay(900).duration(1000)} style={styles.subtitle}>

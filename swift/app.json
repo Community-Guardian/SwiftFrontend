@@ -11,7 +11,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "googleMobileAdsAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx",
+      "googleMobileAdsAppId": "ca-app-pub-3868898371251417~7709116005",
       "iosAppId": "YOUR_IOS_APP_ID"
 
     },
@@ -42,8 +42,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-4992853013448912~4918403340"
-          
+          "androidAppId": "ca-app-pub-3868898371251417~7709116005",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
         }
       ]
     ],

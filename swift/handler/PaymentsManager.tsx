@@ -47,7 +47,11 @@ interface Payment {
   updated_at: string;
   user: string;
   service_type: ServiceType | null;
+  expiration_date: string; // ISO date string
+  is_expired: boolean; // Whether the service has expired
+  total_amount_paid: number; // Total amount paid for the service
 }
+
 
 // Define the error response structure
 interface ApiErrorResponse {

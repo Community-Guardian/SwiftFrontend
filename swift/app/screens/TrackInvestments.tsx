@@ -6,22 +6,23 @@ import { useFinance } from '../../context/FinanceContext';
 import { CustomButton } from '../../components/CustomButton';
 import { CustomInput } from '../../components/CustomInput';
 import { useReferrals } from '@/context/ReferralsContext';
+
 interface Investment {
-    id: number;
-    user: string;
-    amount: number;
-    start_date: string;
-    duration_days: number;
-    interest_rate: number;
-    created_at: string;
-    updated_at: string;
-  }
-  
+  id: number;
+  user: string;
+  amount: number;
+  start_date: string;
+  duration_days: number;
+  interest_rate: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function TrackInvestmentsScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { investments, getInvestments } = useFinance();
-  const { createWithdrawalRequest,loading } = useReferrals();
+  const { createWithdrawalRequest, loading } = useReferrals();
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [selectedInvestment, setSelectedInvestment] = useState<Investment | null>(null);
 
@@ -48,36 +49,45 @@ export default function TrackInvestmentsScreen() {
     }
   };
 
+  const renderInvestmentCard = ({ item }: { item: Investment }) => (
+    <TouchableOpacity
+      style={[
+        styles.investmentCard,
+        { backgroundColor: selectedInvestment?.id === item.id ? themeColors.primary : themeColors.card },
+      ]}
+      onPress={() => setSelectedInvestment(item)}
+    >
+      <Text style={[styles.cardTitle, { color: themeColors.text }]}>Investment #{item.id}</Text>
+      <Text style={[styles.investmentText, { color: themeColors.text }]}>
+        Amount: <Text style={styles.boldText}>Ksh {item.amount}</Text>
+      </Text>
+      <Text style={[styles.investmentText, { color: themeColors.text }]}>
+        Duration: <Text style={styles.boldText}>{item.duration_days} days</Text>
+      </Text>
+      <Text style={[styles.investmentText, { color: themeColors.text }]}>
+        Interest Rate: <Text style={styles.boldText}>{item.interest_rate}%</Text>
+      </Text>
+      <Text style={[styles.investmentText, { color: themeColors.text }]}>
+        Start Date: <Text style={styles.boldText}>{new Date(item.start_date).toLocaleDateString()}</Text>
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <Text style={[styles.title, { color: themeColors.text }]}>Track Investments</Text>
       {loading ? (
         <ActivityIndicator size="large" color={themeColors.primary} style={styles.loadingIndicator} />
       ) : (
         <FlatList
           data={investments}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.investmentCard, { backgroundColor: themeColors.card }]}
-              onPress={() => setSelectedInvestment(item)}
-            >
-              <Text style={[styles.investmentText, { color: themeColors.text }]}>
-                Amount: Ksh {item.amount}
-              </Text>
-              <Text style={[styles.investmentText, { color: themeColors.text }]}>
-                Duration: {item.duration_days} days
-              </Text>
-              <Text style={[styles.investmentText, { color: themeColors.text }]}>
-                Interest Rate: {item.interest_rate}%
-              </Text>
-            </TouchableOpacity>
-          )}
+          renderItem={renderInvestmentCard}
+          contentContainerStyle={styles.listContent}
         />
       )}
 
       {selectedInvestment && (
-        <View style={styles.withdrawalContainer}>
+        <View style={[styles.withdrawalContainer, { backgroundColor: themeColors.card }]}>
           <Text style={[styles.withdrawalTitle, { color: themeColors.text }]}>Request Withdrawal</Text>
           <CustomInput
             placeholder="Enter amount"
@@ -97,33 +107,37 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   loadingIndicator: {
     marginTop: 20,
   },
+  listContent: {
+    paddingBottom: 20,
+  },
   investmentCard: {
-    padding: 16,
-    borderRadius: 8,
+    padding: 20,
+    borderRadius: 12,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   investmentText: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 6,
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
   withdrawalContainer: {
     marginTop: 20,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
