@@ -27,7 +27,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
-  const { rewards, getRewards } = useReferrals();
+  const { rewards, getRewards,loading } = useReferrals();
   const [totalRewards, setTotalRewards] = useState(0);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function HomeScreen() {
 
   const toggleSidebar = () => setSidebarVisible((prev) => !prev);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <View style={[styles.container, styles.center, { backgroundColor: themeColors.background }]}>
         <ActivityIndicator size="large" color={themeColors.primary} />

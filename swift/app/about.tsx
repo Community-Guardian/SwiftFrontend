@@ -34,7 +34,7 @@ export default function AboutScreen() {
       <Text style={[styles.title, { color: themeColors.text }]}>About Us</Text>
       
       <Image
-        source={{ uri: '/placeholder.svg?height=200&width=200' }}
+        source={require('../assets/images/icon.png')}
         style={styles.logo}
       />
       
