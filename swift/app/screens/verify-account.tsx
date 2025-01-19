@@ -6,6 +6,8 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Alert,
+  Modal
 } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import { lightTheme, darkTheme } from "../../styles/theme";
@@ -58,13 +60,14 @@ export default function VerifyAccountScreen() {
   const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const { services, getServices, loading } = useServices();
   const [service, setService] = useState<Service | null>(null);
+  const [serverDown, setServerDown] = useState(false);
 
   useEffect(() => {
     getServices();
   }, []);
 
   useEffect(() => {
-    if (services.length > 0) {
+    if (services.length > 0) {      
       const match = services.find(
         (s) => s.service_type.name === "Activate your account"
       );
@@ -72,6 +75,14 @@ export default function VerifyAccountScreen() {
     }
   }, [services]);
 
+  const handleServerDown = () => {
+    setServerDown(true);
+  };
+
+  const handleLoginRedirect = () => {
+    setServerDown(false);
+    router.replace('/(auth)');
+  };
   const handleVerification = () => {
     if (service) {
       setIsPaymentModalVisible(true);
@@ -146,6 +157,31 @@ export default function VerifyAccountScreen() {
           service={service}
         />
       )}
+        {/* Modal for server down message */}
+        <Modal
+          visible={serverDown}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setServerDown(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: themeColors.card }]}>
+              <Text style={[styles.modalTitle, { color: themeColors.text }]}>
+                Server is Temporarily Down
+              </Text>
+              <Text style={[styles.modalMessage, { color: themeColors.text }]}>
+                We’re experiencing some technical difficulties. Please try again later.
+              </Text>
+              <CustomButton
+                title="Go to Login"
+                onPress={handleLoginRedirect}
+                variant="primary"
+                style={styles.loginButton}
+              />
+            </View>
+          </View>
+        </Modal>
+
     </ScrollView>
   );
 }
@@ -191,5 +227,38 @@ const styles = StyleSheet.create({
   feeAmount: {
     fontSize: 20,
     fontWeight: "700",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
+  modalContent: {
+    width: "85%",
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5, // Elevation for Android shadow
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  modalMessage: {
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 24,
+    textAlign: "center",
+  },
+  loginButton: {
+    alignSelf: "center",
+    width: "80%",
+    borderRadius: 8,
   },
 });

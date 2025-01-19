@@ -155,37 +155,43 @@ export default function AuthScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    backgroundColor: '#f9f9f9',
   },
   card: {
     width: '100%',
-    padding: 20,
-    borderRadius: 10,
+    padding: 24,
+    borderRadius: 12,
     elevation: 5,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'center',
+    color: '#333',
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 16,
+    color: '#666',
   },
   errorText: {
     textAlign: 'center',
     marginBottom: 16,
+    color: '#ff4d4f',
+    backgroundColor: '#ffe6e6',
+    padding: 10,
+    borderRadius: 6,
   },
   form: {
     flexGrow: 1,
@@ -194,7 +200,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 16,
+    marginVertical: 20,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -203,23 +209,31 @@ const styles = StyleSheet.create({
   rememberText: {
     marginLeft: 8,
     fontSize: 14,
+    color: '#333',
   },
   forgotText: {
     fontSize: 14,
+    color: '#1e90ff',
+    textDecorationLine: 'underline',
   },
   termsText: {
     marginLeft: 8,
     fontSize: 14,
+    color: '#333',
   },
   passwordInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 8,
+    position: 'relative',
+    marginVertical: 4,
   },
   passwordToggle: {
     position: 'absolute',
-    right: 16,
-    padding: 8,
+    right: 10,
+    top: '35%',
+    zIndex: 1,
+    padding: 10,
+    marginTop: 15,
+  },
+  buttonContainer: {
+    marginVertical: 16,
   },
 });

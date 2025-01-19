@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "swift",
+    "name": "Swift Traders",
     "slug": "swift",
     "owner":"community-guardian",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash.png",
-    "scheme": "myapp",
+    "scheme": "Swift Traders",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

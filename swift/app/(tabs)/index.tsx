@@ -7,9 +7,6 @@ import {
   Modal,
   ActivityIndicator,
   ScrollView,
-  Platform,
-  StatusBar,
-  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,18 +15,11 @@ import { useTheme } from '../../context/ThemeContext';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useReferrals } from '../../context/ReferralsContext';
-
-import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads'; // Importing Ad components
-import { BannerAd, BannerAdSize, useForeground } from 'react-native-google-mobile-ads';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 import 'expo-dev-client';
 
-// const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-const adUnitId2 = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'homeca-app-pub-3868898371251417/2637856374';
-// const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-//   keywords: ['fashion', 'clothing'],
-// });
-const { width } = Dimensions.get('window');
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'homeca-app-pub-3868898371251417/2637856374';
 
 export default function HomeScreen() {
   const [isSidebarVisible, setSidebarVisible] = useState(false);
@@ -39,51 +29,6 @@ export default function HomeScreen() {
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { rewards, getRewards } = useReferrals();
   const [totalRewards, setTotalRewards] = useState(0);
-  const [loaded, setLoaded] = useState(false); // State to track ad loading status
-
-  // useEffect(() => {
-  //   // Load the interstitial ad immediately
-  //   interstitial.load();
-
-  //   // Listen for ad events
-  //   const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-  //     setLoaded(true);
-  //   });
-
-  //   const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
-  //     if (Platform.OS === 'ios') {
-  //       StatusBar.setHidden(true); // Hide status bar on iOS
-  //     }
-  //   });
-
-  //   const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-  //     if (Platform.OS === 'ios') {
-  //       StatusBar.setHidden(false); // Show status bar again on iOS
-  //     }
-  //     // Load the next ad after closing
-  //     interstitial.load();
-  //   });
-
-  //   // Show the ad after the page has loaded
-  //   const showAdAfterLoad = setTimeout(() => {
-  //     if (loaded) {
-  //       interstitial.show();
-  //     }
-  //   }, 1500); // Wait 1.5 seconds after page load to show ad
-
-  //   // Cleanup event listeners and ad show timeout
-  //   return () => {
-  //     unsubscribeLoaded();
-  //     unsubscribeOpened();
-  //     unsubscribeClosed();
-  //     clearTimeout(showAdAfterLoad); // Clear the timeout on unmount
-  //   };
-  // }, [loaded]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timeout);
-  }, []);
 
   useEffect(() => {
     getRewards();
@@ -131,7 +76,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       {/* Banner Ad */}    
-      <BannerAd unitId={adUnitId2} size={BannerAdSize.BANNER} /> 
+      <BannerAd unitId={adUnitId} size={BannerAdSize.BANNER} /> 
       {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Grid */}
