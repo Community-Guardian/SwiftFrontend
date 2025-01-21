@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
 import { BASE_URL } from '@/handler/apiConfig';
 
 interface RedirectContextProps {
@@ -13,7 +14,7 @@ export const RedirectProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const createReferralLink = (referralCode: string) => {
-    return `${BASE_URL}/referral?code=${referralCode}`;
+    return Linking.createURL(`/(auth)?code=${referralCode}`);
   };
 
   const handleRedirect = (path: string) => {

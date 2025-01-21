@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Axios</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <script>
+    // const BASE_URL = 'https://swift8393.pythonanywhere.com';
+    const BASE_URL = 'https://api.swift-traders.co.ke';
+
+    const simulateClientRequest = async () => {
+      try {
+        const payload = {
+          email: 'admin@gmail.com',
+          password: 'user@12345',
+        };
+
+        const response = await axios.post(`${BASE_URL}/login`, payload);
+        console.log('Response:', response.data);
+      } catch (error) {
+        console.error('Error:', error.message);
+      }
+    };
+
+    simulateClientRequest();
+  </script>
+</body>
+</html>

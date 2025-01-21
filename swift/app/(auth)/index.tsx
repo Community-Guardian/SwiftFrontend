@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter,useLocalSearchParams } from 'expo-router';
 import { CustomInput } from '../../components/CustomInput';
 import { CustomButton } from '../../components/CustomButton';
 import { useTheme } from '../../context/ThemeContext';
@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCreateTradingAccount } from '../../context/CreateTradingAccountContext';
 import { useLogout } from '../../context/LogoutContext';
 import { FontAwesome } from '@expo/vector-icons';  // Import an icon library for toggle
+
 export default function AuthScreen() {
   const router = useRouter();
   const { theme } = useTheme();
@@ -17,13 +18,13 @@ export default function AuthScreen() {
   const { login, register, loading } = useAuth();
   const { hasSkipped, setHasSkipped } = useCreateTradingAccount();
   const { setRememberMe } = useLogout();
-
+  const { code } = useLocalSearchParams();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     name: '',
-    referralCode: '',
+    referralCode: code || '',
   });
   const [rememberMe, setRememberMeState] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -45,8 +46,8 @@ export default function AuthScreen() {
         await register(formData.email, formData.password, formData.password, 'customer');
         }
         catch(error){
-          if (error.email) {
-            setError(error.email);
+          if ((error as any).email) {
+            setError((error as any).email);
             return;
           }
           setError('Failed to register! Please try again');

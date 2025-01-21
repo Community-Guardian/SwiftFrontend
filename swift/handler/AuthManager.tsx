@@ -120,13 +120,16 @@ api.interceptors.response.use(
 class AuthManager {
   async login(email: string, password: string): Promise<AuthResponse | undefined> {
     try {
+      console.log('Logging in...');
+      console.log(BASE_URL);
       const response = await api.post<AuthResponse>(LOGIN_URL, { email, password });
+      console.log(response);
       AsyncStorage.setItem('accessToken', response.data.access);
       AsyncStorage.setItem('refreshToken', response.data.refresh);
       return response.data;
     } catch (error) {
+      console.error('Failed to login', error);
       handleApiError(error as AxiosError<ApiErrorResponse>);
-      return undefined;
     }
   }
 
