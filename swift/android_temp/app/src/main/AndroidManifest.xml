@@ -34,7 +34,7 @@
       </intent-filter>
       <intent-filter android:autoVerify="true" data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="https" android:host="api.swift-traders.co.ke" android:pathPrefix="/"/>
+        <data android:scheme="https" android:host="*.webapp.io" android:pathPrefix="/records"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT"/>
       </intent-filter>
