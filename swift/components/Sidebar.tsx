@@ -19,7 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ closeSidebar }) => {
     { icon: 'home', title: 'Home', action: () => router.push('/') },
     { icon: 'people', title: 'About Us', action: () => router.push('/about') },
     { icon: 'document-text', title: 'Privacy Policy', action: () => router.push('/privacy-policy') },
-    { icon: 'book', title: 'Read Blogs', action: () => router.push('/blogs') },
+    { icon: 'book', title: 'Read Blogs', action: () => router.push('/screens/blogs') },
     { icon: 'cash', title: 'Purchases', action: () => router.push('/screens/paid-services') },
 
     { icon: 'settings', title: 'Settings', action: () => router.push('/settings') },

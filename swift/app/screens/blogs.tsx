@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/styles/theme';
 import { useArticles } from '@/context/ArticlesContext';
 
+const DEFAULT_IMAGE =
+  'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
 export default function BlogsScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
@@ -12,6 +14,10 @@ export default function BlogsScreen() {
   useEffect(() => {
     getArticles();
   }, []);
+
+  const truncateContent = (content: string, maxLength: number = 100) => {
+    return content.length > maxLength ? content.slice(0, maxLength) + '... ' : content;
+  };
 
   if (loading) {
     return (
@@ -22,25 +28,25 @@ export default function BlogsScreen() {
     );
   }
 
-  // if (error) {
-  //   return (
-  //     <View style={[styles.errorContainer, { backgroundColor: themeColors.background }]}>
-  //       <Text style={[styles.errorText, { color: themeColors.error }]}>{error}</Text>
-  //     </View>
-  //   );
-  // }
-
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <Text style={[styles.title, { color: themeColors.text }]}>Blogs</Text>
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={[styles.articleCard, { backgroundColor: themeColors.card }]}>
+            <Image
+              source={item.cover_image ? { uri: item.cover_image } : { uri: DEFAULT_IMAGE } }
+              style={styles.coverImage}
+              resizeMode="cover"
+            />
             <Text style={[styles.articleTitle, { color: themeColors.text }]}>{item.title}</Text>
-            <Text style={[styles.articleAuthor, { color: themeColors.text }]}>By {item.user}</Text>
-            <Text style={[styles.articleContent, { color: themeColors.text }]}>{item.content}</Text>
+            <Text style={[styles.articleContent, { color: themeColors.text }]}>
+              {truncateContent(item.content)}
+              {item.content.length > 100 && (
+                <Text style={[styles.readMore, { color: themeColors.primary }]}>Read more</Text>
+              )}
+            </Text>
             <Text style={[styles.articleDate, { color: themeColors.text }]}>
               Published on {new Date(item.created_at).toLocaleDateString()}
             </Text>
@@ -66,21 +72,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
   articleCard: {
     marginVertical: 8,
     borderRadius: 12,
@@ -90,18 +81,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
   },
+  coverImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
   articleTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
   },
-  articleAuthor: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
   articleContent: {
     fontSize: 14,
     marginBottom: 8,
+  },
+  readMore: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   articleDate: {
     fontSize: 12,

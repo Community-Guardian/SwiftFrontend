@@ -79,6 +79,10 @@ function AppContent() {
         name="TrackInvestments"
         options={{ title: 'Investments', headerLeft: () => <BackButton /> }}
       />
+      <Stack.Screen
+        name="blogs"
+        options={{ title: 'Articles', headerLeft: () => <BackButton /> }}
+      />
     </Stack>
 
   );
