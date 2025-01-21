@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{useEffect} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Linking, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useCreateTradingAccount } from '@/context/CreateTradingAccountContext';
@@ -17,8 +17,12 @@ const { width } = Dimensions.get('window');
 
 const CreateTradingAccountScreen = () => {
   const router = useRouter();
-  const { setHasSkipped } = useCreateTradingAccount();
-
+  const { setHasSkipped ,hasSkipped} = useCreateTradingAccount();
+  useEffect(() => {
+    if (hasSkipped) {
+      router.push('/(tabs)');
+    }
+  }, [hasSkipped, router]);
   const handleSkip = async () => {
     await setHasSkipped(true);
     router.push('/(tabs)');
@@ -44,17 +48,17 @@ const CreateTradingAccountScreen = () => {
             <Text style={styles.brokerTitle}>Choose Your Broker</Text>
             <TouchableOpacity
               style={styles.brokerButton}
-              onPress={() => handleBrokerLink('https://www.fxpesa.com')}
+              onPress={async () => {handleBrokerLink('https://portal.fxpesa.com/live-account/?accountType=Premier&clickid=817641&affid=C00946066');await setHasSkipped(true);}}
             >
               <Ionicons name="globe-outline" size={24} color="#fff" style={styles.brokerIcon} />
               <Text style={styles.brokerButtonText}>FX Pesa</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.brokerButton}
-              onPress={() => handleBrokerLink('https://www.examplebroker.com')}
+              onPress={async () => {handleBrokerLink('https://fbs.partners?ibl=61828&ibp=21507600');await setHasSkipped(true);}}
             >
               <Ionicons name="bar-chart-outline" size={24} color="#fff" style={styles.brokerIcon} />
-              <Text style={styles.brokerButtonText}>XM Broker</Text>
+              <Text style={styles.brokerButtonText}>FBS Traders</Text>
             </TouchableOpacity>
           </Animated.View>
 

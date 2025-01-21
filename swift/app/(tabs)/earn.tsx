@@ -35,12 +35,12 @@ export default function EarnScreen() {
           message: `Join us and earn rewards! Use my referral link: ${referralLink}`,
         });
 
-        if (result.action === Share.sharedAction) {
-          if (!result.activityType) {
-            await createReferral({ referrer: user.referral_code });
-            Alert.alert('Success', 'Referral sent successfully!');
-          }
-        }
+        // if (result.action === Share.sharedAction) {
+        //   if (!result.activityType) {
+        //     await createReferral({ referrer: user.referral_code });
+        //     Alert.alert('Success', 'Referral sent successfully!');
+        //   }
+        // }
       } catch (error) {
         Alert.alert('Error', 'Failed to send referral.');
       }

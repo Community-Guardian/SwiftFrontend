@@ -34,6 +34,11 @@ function AppContent() {
         queryParams
       )}`
     );
+    if(queryParams){
+      if (typeof queryParams.code === 'string') {
+        router.push(`/(auth)?code=${queryParams.code}`);
+      }
+    }
   }
 
 

@@ -52,7 +52,7 @@ interface PaymentsContextProps {
   createPayment: (paymentData: Partial<Payment>) => Promise<void>;
   updatePayment: (id: string, paymentData: Partial<Payment>) => Promise<void>;
   deletePayment: (id: string) => Promise<void>;
-  createMpesaPaymentIntent: (serviceId: number, phone_number: string) => Promise<void>;
+  createMpesaPaymentIntent: (serviceId: number, phone_number: string) => Promise<Payment>;
   refundPayment: (paymentId: string, refundAmount: number, phone_number: string) => Promise<void>;
 }
 
@@ -113,33 +113,49 @@ export const PaymentsProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }
   };
-
   const createMpesaPaymentIntent = async (serviceId: number, phone_number: string) => {
     setLoading(true);
+  
     try {
+      // Step 1: Create the payment intent
       const paymentIntent = await paymentsManager.createMpesaPaymentIntent(serviceId, phone_number);
-      if (paymentIntent) {
-        console.log("Payment intent created:", paymentIntent);
-
-        // Wait for 25 seconds before processing the payment object
-        await new Promise((resolve) => setTimeout(resolve, 25000));
-        await getPayments();
-        const payments = await paymentsManager.getPayments();
-        const newPayment = payments.find((payment) => payment.id === paymentIntent.id);
-        if (newPayment?.payment_status!="paid")  {  
-          throw new Error(newPayment?.result_desc);
+      if (!paymentIntent) {
+        throw new Error("Payment unsuccessful. Please try again.");
+      }  
+      // Step 2: Poll payments to check status
+      const startTime = Date.now();
+      let newPayment = null;
+  
+      while (Date.now() - startTime < 40000) { // 40 seconds timeout
+        const payments = await paymentsManager.getPayments();        
+        newPayment = await payments.find((payment) => payment.id === paymentIntent.id);
+        console.log("Payment retrieved:", newPayment);
+         
+        
+        if (newPayment) {
+          if (newPayment.payment_status === "paid") {
+            console.log("Payment successful:", newPayment);
+            return newPayment;
+          }
+  
+          if (newPayment.payment_status === "incomplete") {
+            throw new Error(newPayment.result_desc || "Payment was incomplete.");
+          }
         }
+  
+        console.log("Payment status is pending. Retrying...");
+        await new Promise((resolve) => setTimeout(resolve, 5000)); // Poll every 5 seconds
       }
-      else{
-        throw new Error("Payment unsucessfull please try again");
-      }
-    } catch (error) {
-      throw new Error("Payment unsucessfull please try again");
+  
+      throw new Error("Payment processing timed out. Please try again.");
+    } catch (error: any) {
+      console.error("Failed to create Mpesa payment intent:", error);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
-
+  
   const refundPayment = async (paymentId: string, refundAmount: number, phone_number: string) => {
     setLoading(true);
     try {

@@ -52,6 +52,9 @@ interface Payment {
   total_amount_paid: number; // Total amount paid for the service
 }
 
+interface payment_details {
+  payment_details: Payment;
+}
 
 // Define the error response structure
 interface ApiErrorResponse {
@@ -185,8 +188,8 @@ class PaymentsManager {
 
   async createMpesaPaymentIntent(serviceId: number, phone_number: string): Promise<Payment | undefined> {
     try {
-      const response = await api.post<Payment>(CREATE_MPESA_PAYMENT_INTENT_URL, { serviceId, phone_number });
-      return response.data;
+      const response = await api.post<payment_details>(CREATE_MPESA_PAYMENT_INTENT_URL, { serviceId, phone_number });
+      return response.data.payment_details;
     } catch (error) {
       handleApiError(error as AxiosError<ApiErrorResponse>);
       return undefined;

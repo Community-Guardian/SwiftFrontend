@@ -23,8 +23,8 @@
           "data": [
             {
               "scheme": "https",
-              "host": "*.webapp.io",
-              "pathPrefix": "/records"
+              "host": "api.swift-traders.co.ke",
+              "pathPrefix": "/"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

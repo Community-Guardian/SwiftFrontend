@@ -133,9 +133,9 @@ class AuthManager {
     }
   }
 
-  async register(email: string, password1: string,password2: string, user_type:string): Promise<AuthResponse | undefined> {
+  async register(email: string, password1: string,password2: string, user_type:string , referral_code: string): Promise<AuthResponse | undefined> {
     try {
-      const response = await api.post(SIGN_UP_URL, { email, password1, password2, user_type });
+      const response = await api.post(SIGN_UP_URL, { email, password1, password2, user_type,referral_code });
       return response.data;
     } catch (error) {
       handleApiError(error as AxiosError<ApiErrorResponse>);

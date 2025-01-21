@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   View,
   Text,
@@ -58,18 +58,29 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
       setError('Please enter a valid phone number.');
       return;
     }
+  
     setLoading(true);
-    setError('');
+    setError(''); // Clear previous errors
+    setSuccess(false);
+  
     try {
-      await createMpesaPaymentIntent( service.id, phone_number );
+      await createMpesaPaymentIntent(service.id, phone_number);
       setSuccess(true);
     } catch (error: any) {
-      setError(error);
+      console.error('Payment error:', error);
+      setError(error.error || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    console.log('Current error state:', error);
+  }, [error]);
+  useEffect(() => {
+    setLoading(false);
+    setError(''); // Clear previous errors
+    setSuccess(false);
+    }, [onClose]);
   return (
     <Modal visible={isVisible} transparent animationType="slide">
       <View style={styles.container}>
@@ -99,7 +110,7 @@ const PayModal: React.FC<PayModalProps> = ({ isVisible, onClose, service }) => {
                 value={phone_number}
                 onChangeText={setPhoneNumber}
               />
-              <TouchableOpacity onPress={handleNext} style={styles.payButton}>
+              <TouchableOpacity onPress={handlePayment} style={styles.payButton}>
                 <Text style={styles.payButtonText}>Confirm Payment</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>

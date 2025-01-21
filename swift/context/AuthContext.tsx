@@ -26,7 +26,7 @@ interface AuthContextProps {
   user: User | null;
   updateUser: (id: string, data: FormData) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password1: string, password2: string, user_type: string) => Promise<void>;
+  register: (email: string, password1: string, password2: string, user_type: string,referral_code: string ) => Promise<void>;
   refreshToken: () => Promise<void>;
   logout: () => void;
 }
@@ -63,10 +63,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (email: string, password1: string, password2: string, user_type: string) => {
+  const register = async (email: string, password1: string, password2: string, user_type: string, referral_code: string) => {
     setLoading(true);
     try {
-      await AuthManager.register(email, password1, password2, user_type);
+      await AuthManager.register(email, password1, password2, user_type, referral_code);
       await login(email, password1);
     } catch (error) {
       console.error('Registration failed', error);

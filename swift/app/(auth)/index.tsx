@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter,useLocalSearchParams } from 'expo-router';
 import { CustomInput } from '../../components/CustomInput';
@@ -30,7 +30,13 @@ export default function AuthScreen() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [error, setError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);  // State for password visibility
-
+  console.log('code', code);
+  useEffect(() => { 
+    if (code) {
+      setIsLogin(code ? false : true);
+    }
+  }, []);
+  
   const handleAuth = async () => {
     try {
       if (isLogin) {
@@ -43,7 +49,7 @@ export default function AuthScreen() {
         }
       } else {
         try{
-        await register(formData.email, formData.password, formData.password, 'customer');
+        await register(formData.email, formData.password, formData.password, 'customer', Array.isArray(formData.referralCode) ? formData.referralCode[0] : formData.referralCode);
         }
         catch(error){
           if ((error as any).email) {

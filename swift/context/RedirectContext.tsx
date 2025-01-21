@@ -14,7 +14,7 @@ export const RedirectProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const createReferralLink = (referralCode: string) => {
-    return Linking.createURL(`/(auth)?code=${referralCode}`);
+    return `${BASE_URL}/?code=${encodeURIComponent(referralCode)}`;
   };
 
   const handleRedirect = (path: string) => {

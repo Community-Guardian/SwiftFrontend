@@ -28,7 +28,7 @@ import 'expo-dev-client';
 
 import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
-const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-3868898371251417~7709116005';
 
 
 interface ServiceType {
@@ -176,7 +176,7 @@ export default function VerifyAccountScreen() {
                 title="Go to Login"
                 onPress={handleLoginRedirect}
                 variant="primary"
-                style={styles.loginButton}
+                // style={styles.loginButton}
               />
             </View>
           </View>

@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   Modal,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/styles/theme';
 import { usePayments } from '@/context/PaymentsContext';
+import { Linking } from 'react-native';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
@@ -27,7 +29,7 @@ interface ServiceType {
 interface Service {
   id: number;
   name: string;
-  service_type: ServiceType; // Nested service type object
+  service_type: ServiceType;
   service_type_id: string;
   price: number;
   description: string;
@@ -38,6 +40,7 @@ interface Service {
   updated_at: string;
   image: string;
 }
+
 interface Payment {
   id: string;
   service_id: number;
@@ -52,11 +55,10 @@ interface Payment {
   updated_at: string;
   user: string;
   service_type: ServiceType | null;
-  expiration_date: string; // ISO date string
-  is_expired: boolean; // Whether the service has expired
-  total_amount_paid: number; // Total amount paid for the service
+  expiration_date: string;
+  is_expired: boolean;
+  total_amount_paid: number;
 }
-
 
 export default function PaidServicesScreen() {
   const { theme } = useTheme();
@@ -67,21 +69,21 @@ export default function PaidServicesScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger the loading state and fetch data
     getPayments();
   }, []);
 
   useEffect(() => {
-    // Filter payments with payment_status equal to 'paid' and map to services
-    const services = payments
-      .filter((payment) => payment.payment_status === 'paid')
-      // .map((payment) => payment);
+    const services = payments.filter((payment) => payment.payment_status === 'paid');
     setPaidServices(services);
   }, [payments]);
 
   const handleView = (service: Payment) => {
-    setSelectedService(service);
-    setModalVisible(true);
+    if (service.service.service_type.name === 'Activate your account') {
+      Alert.alert('Account Activated', 'Thank you for activating your account! It is now unlocked forever.');
+    } else {
+      setSelectedService(service);
+      setModalVisible(true);
+    }
   };
 
   const closeModal = () => {
@@ -89,7 +91,6 @@ export default function PaidServicesScreen() {
     setSelectedService(null);
   };
 
-  // Show loading indicator while the data is being fetched
   if (loading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: themeColors.background }]}>
@@ -115,29 +116,22 @@ export default function PaidServicesScreen() {
               />
               <View style={styles.serviceInfo}>
                 <Text style={[styles.serviceTitle, { color: themeColors.text }]}>{item.service.name}</Text>
-                <Text
-                  style={[styles.serviceDescription, { color: themeColors.text }]}
-                  numberOfLines={2}
-                >
+                <Text style={[styles.serviceDescription, { color: themeColors.text }]} numberOfLines={2}>
                   {item.service.description}
                 </Text>
-                {item.service.service_type.name !== 'Activate your account' && (
-                  <TouchableOpacity
-                    onPress={() => handleView(item)}
-                    style={[styles.viewButton, { backgroundColor: themeColors.primary }]}
-                  >
-                    <Text style={styles.viewButtonText}>View</Text>
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  onPress={() => handleView(item)}
+                  style={[styles.viewButton, { backgroundColor: themeColors.primary }]}
+                >
+                  <Text style={styles.viewButtonText}>View</Text>
+                </TouchableOpacity>
               </View>
             </View>
           )}
         />
       ) : (
         <View style={styles.noServicesContainer}>
-          <Text style={[styles.noServicesText, { color: themeColors.text }]}>
-            You have no paid services.
-          </Text>
+          <Text style={[styles.noServicesText, { color: themeColors.text }]}>You have no paid services.</Text>
         </View>
       )}
 
@@ -159,11 +153,7 @@ export default function PaidServicesScreen() {
                   <View
                     style={[
                       styles.statusDot,
-                      {
-                        backgroundColor: selectedService.is_expired
-                          ? 'red'
-                          : 'green',
-                      },
+                      { backgroundColor: selectedService.is_expired ? 'red' : 'green' },
                     ]}
                   />
                 </View>
@@ -171,33 +161,25 @@ export default function PaidServicesScreen() {
                   {selectedService.service.description}
                 </Text>
                 <View style={styles.modalDetailRow}>
-                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
-                    Price:
-                  </Text>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>Price:</Text>
                   <Text style={[styles.modalValue, { color: themeColors.text }]}>
                     Ksh {selectedService.service.price}
                   </Text>
                 </View>
                 <View style={styles.modalDetailRow}>
-                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
-                    Duration:
-                  </Text>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>Duration:</Text>
                   <Text style={[styles.modalValue, { color: themeColors.text }]}>
                     {selectedService.service.duration} days
                   </Text>
                 </View>
                 <View style={styles.modalDetailRow}>
-                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
-                    Purchased on:
-                  </Text>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>Purchased on:</Text>
                   <Text style={[styles.modalValue, { color: themeColors.text }]}>
                     {new Date(selectedService.created_at).toLocaleDateString()}
                   </Text>
                 </View>
                 <View style={styles.modalDetailRow}>
-                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
-                    Expires on:
-                  </Text>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>Expires on:</Text>
                   <Text style={[styles.modalValue, { color: themeColors.text }]}>
                     {selectedService.expiration_date
                       ? new Date(selectedService.expiration_date).toLocaleDateString()
@@ -205,9 +187,7 @@ export default function PaidServicesScreen() {
                   </Text>
                 </View>
                 <View style={styles.modalDetailRow}>
-                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>
-                    Status:
-                  </Text>
+                  <Text style={[styles.modalLabel, { color: themeColors.text }]}>Status:</Text>
                   <Text
                     style={[
                       styles.modalValue,
@@ -220,6 +200,19 @@ export default function PaidServicesScreen() {
                     {selectedService.service.is_active ? 'Active' : 'Expired'}
                   </Text>
                 </View>
+                {/* WhatsApp Group Link */}
+                {/* WhatsApp Group Link */}
+                {selectedService.service.link && (
+                  <View style={[styles.modalDetailRow, { marginTop: 16 }]}>
+                    <Text style={[styles.modalLabel, { color: themeColors.text }]}>WhatsApp Group:</Text>
+                    <TouchableOpacity
+                      onPress={() => Linking.openURL(selectedService.service.link)}
+                      style={styles.whatsappLinkButton}
+                    >
+                      <Text style={[styles.whatsappLinkText, { color: themeColors.primary }]}>Join Group</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
                   <Text style={styles.closeButtonText}>Close</Text>
                 </TouchableOpacity>
@@ -228,7 +221,6 @@ export default function PaidServicesScreen() {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -278,7 +270,6 @@ const styles = StyleSheet.create({
   serviceDescription: {
     fontSize: 14,
     marginBottom: 8,
-    color: '#757575',
   },
   viewButton: {
     paddingVertical: 10,
@@ -320,13 +311,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   statusDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
     marginLeft: 8,
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 16,
   },
   modalDetailRow: {
     flexDirection: 'row',
@@ -340,18 +335,6 @@ const styles = StyleSheet.create({
   modalValue: {
     fontSize: 16,
   },
-  modalDescription: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  modalPrice: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  modalDuration: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
   closeButton: {
     paddingVertical: 10,
     borderRadius: 8,
@@ -362,4 +345,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  whatsappLinkButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  whatsappLinkText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  
 });
