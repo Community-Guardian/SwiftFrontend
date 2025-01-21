@@ -9,10 +9,10 @@ export default function PrivacyPolicyScreen() {
   const [loading, setLoading] = useState(true);
 
   const sections = [
-    {
-      title: 'Information We Collect',
-      content: 'We collect information that you provide directly to us, including name, email address, and location. We also collect information about your usage of our services and trading patterns.',
-    },
+    // {
+    //   title: 'Information We Collect',
+    //   content: 'We collect information that you provide directly to us, including name, email address, and location. We also collect information about your usage of our services and trading patterns.',
+    // },
     {
       title: 'How We Use Your Information',
       content: 'We use the information we collect to provide and improve our services, send you trading signals, and communicate with you about our products and updates.',
@@ -76,8 +76,8 @@ export default function PrivacyPolicyScreen() {
         </Text>
         <Text style={[styles.text, { color: themeColors.text }]}>
           If you have any questions about this Privacy Policy, please contact us at:
-          {'\n'}Email: Swift@tradingapp.com
-          {'\n'}Phone: +254 716549814
+          {'\n'}Email: admin@swift-trades.co.ke
+          {'\n'}Phone: +254759777254
         </Text>
       </View>
     </ScrollView>
