@@ -1,22 +1,27 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { lightTheme, darkTheme } from '@/styles/theme';
 import { useArticles } from '@/context/ArticlesContext';
 
 const DEFAULT_IMAGE =
   'https://media.istockphoto.com/id/1130260211/photo/us-dollar-bills-on-a-background-with-dynamics-of-exchange-rates-trading-and-financial-risk.jpg?s=2048x2048&w=is&k=20&c=HkjyZluWVg7XxhQblMaD6xjwzXxBHgidl0fcdWGg5X4=';
+
 export default function BlogsScreen() {
   const { theme } = useTheme();
   const themeColors = theme === 'light' ? lightTheme : darkTheme;
   const { articles, loading, getArticles } = useArticles();
+  const [expandedArticles, setExpandedArticles] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     getArticles();
   }, []);
 
-  const truncateContent = (content: string, maxLength: number = 100) => {
-    return content.length > maxLength ? content.slice(0, maxLength) + '... ' : content;
+  const toggleReadMore = (id: number) => {
+    setExpandedArticles((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
   };
 
   if (loading) {
@@ -33,25 +38,35 @@ export default function BlogsScreen() {
       <FlatList
         data={articles}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={[styles.articleCard, { backgroundColor: themeColors.card }]}>
-            <Image
-              source={item.cover_image ? { uri: item.cover_image } : { uri: DEFAULT_IMAGE } }
-              style={styles.coverImage}
-              resizeMode="cover"
-            />
-            <Text style={[styles.articleTitle, { color: themeColors.text }]}>{item.title}</Text>
-            <Text style={[styles.articleContent, { color: themeColors.text }]}>
-              {truncateContent(item.content)}
-              {item.content.length > 100 && (
-                <Text style={[styles.readMore, { color: themeColors.primary }]}>Read more</Text>
-              )}
-            </Text>
-            <Text style={[styles.articleDate, { color: themeColors.text }]}>
-              Published on {new Date(item.created_at).toLocaleDateString()}
-            </Text>
-          </View>
-        )}
+        renderItem={({ item }) => {
+          const isExpanded = expandedArticles[item.id];
+          return (
+            <View style={[styles.articleCard, { backgroundColor: themeColors.card }]}>
+              <Image
+                source={item.cover_image ? { uri: item.cover_image } : { uri: DEFAULT_IMAGE }}
+                style={styles.coverImage}
+                resizeMode="cover"
+              />
+              <Text style={[styles.articleTitle, { color: themeColors.text }]}>{item.title}</Text>
+              <Text style={[styles.articleContent, { color: themeColors.text }]}>
+                {isExpanded ? item.content : item.content.slice(0, 100) + '... '}
+                {!isExpanded && item.content.length > 100 && (
+                  <TouchableOpacity onPress={() => toggleReadMore(item.id)}>
+                    <Text style={[styles.readMore, { color: themeColors.primary }]}>Read more</Text>
+                  </TouchableOpacity>
+                )}
+                {isExpanded && (
+                  <TouchableOpacity onPress={() => toggleReadMore(item.id)}>
+                    <Text style={[styles.readMore, { color: themeColors.primary }]}>Show less</Text>
+                  </TouchableOpacity>
+                )}
+              </Text>
+              <Text style={[styles.articleDate, { color: themeColors.text }]}>
+                Published on {new Date(item.created_at).toLocaleDateString()}
+              </Text>
+            </View>
+          );
+        }}
       />
     </View>
   );

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Swift Traders",
     "slug": "swift",
-    "owner":"community-guardian",
+    "owner":"swift-traders",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash.png",

@@ -35,6 +35,8 @@ export default function AuthScreen() {
     if (code) {
       setIsLogin(code ? false : true);
     }
+    console.log('isLogin', isLogin);
+    
   }, []);
   
   const handleAuth = async () => {
@@ -56,7 +58,8 @@ export default function AuthScreen() {
             setError((error as any).email);
             return;
           }
-          setError('Failed to register! Please try again');
+          setError('');
+          setIsLogin(true)
           return;
         }
         if (!hasSkipped) {

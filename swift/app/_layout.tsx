@@ -18,7 +18,6 @@ import { useRouter } from 'expo-router';
 
 
 import { useEffect, useState } from 'react';
-
 function AppContent() {
   const { isConnected } = useConnectivity();
   const { isAuthenticated } = useAuth();
@@ -26,21 +25,18 @@ function AppContent() {
   const router = useRouter();
   const url = Linking.useURL();
 
-  if (url) {
-    const { hostname, path, queryParams } = Linking.parse(url);
-    console.log('url', url);
-    console.log(
-      `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
-        queryParams
-      )}`
-    );
-    if(queryParams){
-      if (typeof queryParams.code === 'string') {
-        router.push(`/(auth)?code=${queryParams.code}`);
+  useEffect(() => {
+    if (url) {
+      const { hostname, path, queryParams } = Linking.parse(url);
+      console.log('url', url);
+      console.log(
+        `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(queryParams)}`
+      );
+      if (queryParams && typeof queryParams.code === 'string') {
+        router.push(`/?code=${queryParams.code}`);
       }
     }
-  }
-
+  }, [url, router]);
 
   useEffect(() => {
     async function initialize() {
@@ -51,42 +47,38 @@ function AppContent() {
 
       await mobileAds().initialize();
       setInitialized(true);
-      if (!isAuthenticated) {
-        // Render authentication-related screens
-        return (
-          <Stack screenOptions={{
-            headerShown: false, // Hide the header
-          }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
-        );
-      }
     }
     initialize();
-  }, [isAuthenticated]);
+  }, []);
 
   if (!initialized) {
     // Render a loading screen or nothing while initializing
     return null;
   }
 
-  
-
   if (!isConnected) {
     // Render offline screen when no connectivity
     return <OfflineScreen />;
   }
 
+  if (!isAuthenticated) {
+    // Render authentication-related screens
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+
   // Render main application when authenticated and connected
   return (
-    <Stack screenOptions={{
-      headerShown: false, // Hide the header
-    }}>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="screens" options={{ headerShown: false }} />
     </Stack>
   );
 }
+
 
 export default function RootLayoutNav() {
   return (

@@ -1,6 +1,6 @@
 // const BASE_URL = 'https://swift8393.pythonanywhere.com';
-const BASE_URL = 'https://api.swift-traders.co.ke';
-// const BASE_URL = 'http://192.168.0.105:80';
+// const BASE_URL = 'https://api.swift-traders.co.ke';
+const BASE_URL = 'http://192.168.0.105:80';
 export { BASE_URL };
 // User endpoints
 /**

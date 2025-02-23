@@ -19,7 +19,7 @@ import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads'
 
 import 'expo-dev-client';
 
-const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'homeca-app-pub-3868898371251417/2637856374';
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-3868898371251417/3578299301';
 
 export default function HomeScreen() {
   const [isSidebarVisible, setSidebarVisible] = useState(false);
