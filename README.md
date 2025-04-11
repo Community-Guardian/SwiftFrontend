@@ -44,14 +44,7 @@ npm start
 
 Swift Traders is an **open-source** project, and contributions are welcome! Feel free to fork the repository, submit issues, and open pull requests to enhance the app.
 
-## 📬 Contact
 
-📧 Email: [benjaminkaranja8393official@gmail.com](mailto:benjaminkaranja8393official@gmail.com)  
-🔗 Portfolio: [https://karanjasoftwareengineer.great-site.net](https://karanjasoftwareengineer.great-site.net)  
-🐦 GitHub: [@nrad8394](https://github.com/Nrad8394)  
-💼 LinkedIn: [www.linkedin.com/in/benjamin-karanja-93852523b](https://www.linkedin.com/in/benjamin-karanja-93852523b)  
-
----
 
 📈 **Swift Traders – Master Financial Literacy & Trading!**
 
